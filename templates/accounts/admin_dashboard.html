@@ -4,132 +4,187 @@
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
+
+<style>
+/* STATUS BADGES */
+.badge {
+    padding: .25rem .6rem;
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.status-confirmed {
+    background: rgba(16,185,129,.1);
+    color: #059669;
+}
+
+.status-pending {
+    background: rgba(245,158,11,.1);
+    color: #D97706;
+}
+
+.status-completed {
+    background: rgba(59,130,246,.1);
+    color: #2563EB;
+}
+
+.status-cancelled,
+.status-unknown {
+    background: rgba(239,68,68,.1);
+    color: #DC2626;
+}
+</style>
+
 <div class="section" style="background:var(--gray-50); min-height:80vh">
     <div class="container">
+
+        <!-- HEADER -->
         <div class="section-header" style="text-align:left; margin-bottom:2rem">
             <div class="badge-tag"><i class="fas fa-shield-alt"></i> Administrative Control</div>
             <h2>Admin Dashboard</h2>
             <p>Welcome, {{ user.first_name|default:user.username }}. Manage your platform's growth and operations.</p>
         </div>
 
-        <!-- ── STATS CARDS ────────────────────────────────────────── -->
+        <!-- STATS -->
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:1.5rem; margin-bottom:3rem">
+
             <div style="background:white; padding:1.5rem; border-radius:var(--radius); box-shadow:var(--shadow-sm); border-left:4px solid var(--saffron)">
-                <div style="font-size:.85rem; color:var(--gray-500); font-weight:600; text-transform:uppercase; letter-spacing:.05em">Total Revenue</div>
-                <div style="font-size:1.75rem; font-weight:800; color:var(--navy); margin-top:.5rem">₹{{ total_revenue|floatformat:0 }}</div>
-                <div style="font-size:.78rem; color:var(--success); margin-top:.25rem"><i class="fas fa-chart-line"></i> Confirmed Bookings</div>
+                <div class="label">Total Revenue</div>
+                <div class="value">₹{{ total_revenue|floatformat:0 }}</div>
+                <div class="meta"><i class="fas fa-chart-line"></i> Confirmed Bookings</div>
             </div>
+
             <div style="background:white; padding:1.5rem; border-radius:var(--radius); box-shadow:var(--shadow-sm); border-left:4px solid var(--teal)">
-                <div style="font-size:.85rem; color:var(--gray-500); font-weight:600; text-transform:uppercase; letter-spacing:.05em">Total Users</div>
-                <div style="font-size:1.75rem; font-weight:800; color:var(--navy); margin-top:.5rem">{{ total_users }}</div>
-                <div style="font-size:.78rem; color:var(--gray-400); margin-top:.25rem">Registered Travellers</div>
+                <div class="label">Total Users</div>
+                <div class="value">{{ total_users }}</div>
+                <div class="meta">Registered Travellers</div>
             </div>
+
             <div style="background:white; padding:1.5rem; border-radius:var(--radius); box-shadow:var(--shadow-sm); border-left:4px solid var(--navy)">
-                <div style="font-size:.85rem; color:var(--gray-500); font-weight:600; text-transform:uppercase; letter-spacing:.05em">Total Bookings</div>
-                <div style="font-size:1.75rem; font-weight:800; color:var(--navy); margin-top:.5rem">{{ total_bookings }}</div>
-                <div style="font-size:.78rem; color:var(--gray-400); margin-top:.25rem">{{ pending_count }} Pending approval</div>
+                <div class="label">Total Bookings</div>
+                <div class="value">{{ total_bookings }}</div>
+                <div class="meta">{{ pending_count }} Pending approval</div>
             </div>
+
             <div style="background:white; padding:1.5rem; border-radius:var(--radius); box-shadow:var(--shadow-sm); border-left:4px solid var(--saffron)">
-                <div style="font-size:.85rem; color:var(--gray-500); font-weight:600; text-transform:uppercase; letter-spacing:.05em">Tour Packages</div>
-                <div style="font-size:1.75rem; font-weight:800; color:var(--navy); margin-top:.5rem">{{ total_packages }}</div>
-                <div style="font-size:.78rem; color:var(--gray-400); margin-top:.25rem">Active Destinations</div>
+                <div class="label">Tour Packages</div>
+                <div class="value">{{ total_packages }}</div>
+                <div class="meta">Active Destinations</div>
             </div>
+
         </div>
 
-        <!-- ── TABS FOR DATABASE VIEW ──────────────────────────────── -->
+        <!-- TABS -->
         <div class="detail-tabs" style="margin-bottom:1.5rem">
             <button class="tab-btn active" data-tab="tab-bookings">All Bookings</button>
             <button class="tab-btn" data-tab="tab-users">All Users</button>
             <button class="tab-btn" data-tab="tab-packages">Tour Packages</button>
         </div>
 
-        <!-- ── TAB: BOOKINGS ───────────────────────────────────────── -->
+        <!-- BOOKINGS -->
         <div class="tab-panel active" id="tab-bookings">
             <div style="background:white; border-radius:var(--radius); box-shadow:var(--shadow-sm); overflow-x:auto">
-                <table style="width:100%; border-collapse:collapse; text-align:left">
+                <table style="width:100%; border-collapse:collapse;">
                     <thead>
-                        <tr style="background:var(--gray-50); border-bottom:1px solid var(--gray-200)">
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">Ref #</th>
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">User</th>
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">Package</th>
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">Date</th>
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">Amount</th>
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">Status</th>
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">Actions</th>
+                        <tr style="background:var(--gray-50)">
+                            <th>Ref #</th>
+                            <th>User</th>
+                            <th>Package</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         {% for b in all_bookings %}
-                        <tr style="border-bottom:1px solid var(--gray-100)">
-                            <td style="padding:1rem; font-weight:700; color:var(--navy)">#{{ b.booking_ref }}</td>
-                            <td style="padding:1rem">
-                                <div style="font-weight:600">{{ b.full_name }}</div>
-                                <div style="font-size:.75rem; color:var(--gray-500)">{{ b.user.email }}</div>
+                        <tr>
+                            <td>#{{ b.booking_ref }}</td>
+
+                            <td>
+                                <strong>{{ b.full_name|default:"N/A" }}</strong><br>
+                                <small>{{ b.user.email|default:"—" }}</small>
                             </td>
-                            <td style="padding:1rem; font-size:.9rem">{{ b.package.title }}</td>
-                            <td style="padding:1rem; font-size:.85rem">{{ b.travel_date|date:"d M Y" }}</td>
-                            <td style="padding:1rem; font-weight:700">₹{{ b.total_amount|floatformat:0 }}</td>
-                            <td style="padding:1rem">
-                                <span class="badge" style="
-                                    background:{% if b.status == 'confirmed' %}rgba(16,185,129,.1){% elif b.status == 'pending' %}rgba(245,158,11,.1){% elif b.status == 'completed' %}rgba(59,130,246,.1){% else %}rgba(239,68,68,.1){% endif %};
-                                    color:{% if b.status == 'confirmed' %}#059669{% elif b.status == 'pending' %}#D97706{% elif b.status == 'completed' %}#2563EB{% else %}#DC2626{% endif %};
-                                    padding:.25rem .6rem; border-radius:999px; font-size:.75rem; font-weight:700; text-transform:uppercase">
-                                    {{ b.status }}
+
+                            <td>{{ b.package.title }}</td>
+
+                            <td>{{ b.travel_date|date:"d M Y" }}</td>
+
+                            <td><strong>₹{{ b.total_amount|floatformat:0 }}</strong></td>
+
+                            <!-- CLEAN STATUS -->
+                            <td>
+                                <span class="badge status-{{ b.status|default:'unknown' }}">
+                                    {{ b.status|title }}
                                 </span>
                             </td>
-                            <td style="padding:1rem">
+
+                            <td>
                                 {% if b.status == 'pending' %}
-                                    <a href="{% url 'accounts:admin_update_booking_status' b.id 'confirmed' %}" class="btn btn-teal btn-sm" style="padding:.2rem .4rem; font-size:.7rem; margin-right:.25rem;" title="Mark Confirmed"><i class="fas fa-check"></i></a>
+                                    <a href="{% url 'accounts:admin_update_booking_status' b.id 'confirmed' %}" class="btn btn-teal btn-sm">✔</a>
                                 {% endif %}
+
                                 {% if b.status == 'confirmed' %}
-                                    <a href="{% url 'accounts:admin_update_booking_status' b.id 'completed' %}" class="btn btn-primary btn-sm" style="padding:.2rem .4rem; font-size:.7rem; margin-right:.25rem;" title="Mark Completed"><i class="fas fa-flag-checkered"></i></a>
+                                    <a href="{% url 'accounts:admin_update_booking_status' b.id 'completed' %}" class="btn btn-primary btn-sm">🏁</a>
                                 {% endif %}
+
                                 {% if b.status != 'cancelled' and b.status != 'completed' %}
-                                    <a href="{% url 'accounts:admin_update_booking_status' b.id 'cancelled' %}" class="btn btn-outline btn-sm" style="padding:.2rem .4rem; font-size:.7rem; color:var(--danger); border-color:var(--danger)" title="Cancel Booking"><i class="fas fa-times"></i></a>
+                                    <a href="{% url 'accounts:admin_update_booking_status' b.id 'cancelled' %}" class="btn btn-outline btn-sm">✖</a>
                                 {% endif %}
                             </td>
                         </tr>
+
                         {% empty %}
-                        <tr><td colspan="7" style="padding:2rem; text-align:center; color:var(--gray-400)">No bookings found.</td></tr>
+                        <tr>
+                            <td colspan="7" style="text-align:center; padding:2rem;">
+                                No bookings found.
+                            </td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- ── TAB: USERS ──────────────────────────────────────────── -->
+        <!-- USERS -->
         <div class="tab-panel" id="tab-users">
             <div style="background:white; border-radius:var(--radius); box-shadow:var(--shadow-sm); overflow-x:auto">
-                <table style="width:100%; border-collapse:collapse; text-align:left">
+                <table style="width:100%;">
                     <thead>
-                        <tr style="background:var(--gray-50); border-bottom:1px solid var(--gray-200)">
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">Username</th>
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">Full Name</th>
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">Email</th>
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">Verified</th>
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">Actions</th>
+                        <tr>
+                            <th>Username</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Verified</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         {% for u in all_users %}
-                        <tr style="border-bottom:1px solid var(--gray-100)">
-                            <td style="padding:1rem; font-weight:600">{{ u.username }}</td>
-                            <td style="padding:1rem">{{ u.get_full_name|default:"—" }}</td>
-                            <td style="padding:1rem">{{ u.email }}</td>
-                            <td style="padding:1rem">
+                        <tr>
+                            <td>{{ u.username }}</td>
+                            <td>{{ u.get_full_name|default:"—" }}</td>
+                            <td>{{ u.email }}</td>
+
+                            <td>
                                 {% if u.profile.email_verified %}
-                                <span style="color:var(--success)"><i class="fas fa-check-circle"></i> Yes</span>
+                                    <span style="color:green;">✔ Yes</span>
                                 {% else %}
-                                <span style="color:var(--danger)"><i class="fas fa-times-circle"></i> No</span>
+                                    <span style="color:red;">✖ No</span>
                                 {% endif %}
                             </td>
-                            <td style="padding:1rem">
+
+                            <td>
                                 {% if not u.profile.email_verified %}
-                                <a href="{% url 'accounts:admin_verify_user' u.id %}" class="btn btn-primary btn-sm" style="padding:.2rem .5rem; font-size:.75rem">
-                                    Verify Manually
-                                </a>
+                                    <a href="{% url 'accounts:admin_verify_user' u.id %}" class="btn btn-primary btn-sm">
+                                        Verify
+                                    </a>
                                 {% else %}
-                                <span style="font-size:.75rem; color:var(--gray-400)">No action needed</span>
+                                    <small>No action needed</small>
                                 {% endif %}
                             </td>
                         </tr>
@@ -139,40 +194,43 @@
             </div>
         </div>
 
-        <!-- ── TAB: PACKAGES ───────────────────────────────────────── -->
+        <!-- PACKAGES -->
         <div class="tab-panel" id="tab-packages">
             <div style="background:white; border-radius:var(--radius); box-shadow:var(--shadow-sm); overflow-x:auto">
-                <table style="width:100%; border-collapse:collapse; text-align:left">
+                <table style="width:100%;">
                     <thead>
-                        <tr style="background:var(--gray-50); border-bottom:1px solid var(--gray-200)">
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">Package Title</th>
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">Destination</th>
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">Duration</th>
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">Price</th>
-                            <th style="padding:1rem; font-size:.85rem; color:var(--gray-600)">Status</th>
+                        <tr>
+                            <th>Title</th>
+                            <th>Destination</th>
+                            <th>Duration</th>
+                            <th>Price</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         {% for p in all_packages %}
-                        <tr style="border-bottom:1px solid var(--gray-100)">
-                            <td style="padding:1rem; font-weight:600; color:var(--navy)">{{ p.title }}</td>
-                            <td style="padding:1rem; text-transform:capitalize">{{ p.get_state_display }}</td>
-                            <td style="padding:1rem">{{ p.duration_days }} Days</td>
-                            <td style="padding:1rem; font-weight:700">₹{{ p.price_per_person|floatformat:0 }}</td>
-                            <td style="padding:1rem">
+                        <tr>
+                            <td>{{ p.title }}</td>
+                            <td>{{ p.get_state_display }}</td>
+                            <td>{{ p.duration_days }} Days</td>
+                            <td>₹{{ p.price_per_person|floatformat:0 }}</td>
+
+                            <td>
                                 {% if p.is_active %}
-                                <span style="color:var(--success)"><i class="fas fa-eye"></i> Active</span>
+                                    <span style="color:green;">Active</span>
                                 {% else %}
-                                <span style="color:var(--gray-400)"><i class="fas fa-eye-slash"></i> Inactive</span>
+                                    <span style="color:gray;">Inactive</span>
                                 {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+
                 <div style="padding:1.5rem; text-align:center">
                     <a href="/admin/core/tourpackage/add/" class="btn btn-outline btn-sm">
-                        <i class="fas fa-plus"></i> Add New Package via Admin Panel
+                        + Add Package
                     </a>
                 </div>
             </div>
@@ -181,15 +239,19 @@
     </div>
 </div>
 
+<!-- FIXED JS -->
 <script>
-    // Simple Tab Switcher
+document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
             btn.classList.add('active');
             document.getElementById(btn.dataset.tab).classList.add('active');
         });
     });
+});
 </script>
+
 {% endblock %}

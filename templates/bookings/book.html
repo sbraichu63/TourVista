@@ -19,13 +19,15 @@
 
       <!-- FORM -->
       <div class="booking-card">
-        <h3
-          style="font-family:var(--font-body);font-size:1.05rem;font-weight:700;margin-bottom:1.5rem;color:var(--navy)">
+        <h3 style="font-family:var(--font-body);font-size:1.05rem;font-weight:700;margin-bottom:1.5rem;color:var(--navy)">
           <i class="fas fa-user-circle" style="color:var(--saffron)"></i> Traveller Details
         </h3>
 
         <form method="post" id="booking-form" novalidate>
           {% csrf_token %}
+
+          <!-- ✅ FIX: package id for AJAX -->
+          <input type="hidden" id="package-id" value="{{ package.id }}">
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
             <div class="form-group">
@@ -33,9 +35,6 @@
               <input type="text" name="first_name"
                 class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
                 value="{{ form.first_name.value|default:'' }}" required>
-              {% if form.first_name.errors %}
-              <div class="form-error">{{ form.first_name.errors.0 }}</div>
-              {% endif %}
             </div>
 
             <div class="form-group">
@@ -43,35 +42,21 @@
               <input type="text" name="last_name"
                 class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
                 value="{{ form.last_name.value|default:'' }}" required>
-              {% if form.last_name.errors %}
-              <div class="form-error">{{ form.last_name.errors.0 }}</div>
-              {% endif %}
             </div>
           </div>
 
           <div class="form-group">
             <label class="form-label">Email Address <span class="required">*</span></label>
-            <div class="input-icon">
-              <i class="fas fa-envelope"></i>
-              <input type="email" name="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}"
-                value="{{ form.email.value|default:'' }}" required>
-            </div>
-            {% if form.email.errors %}
-            <div class="form-error">{{ form.email.errors.0 }}</div>
-            {% endif %}
-            <div class="form-hint">Booking confirmation will be sent to this email.</div>
+            <input type="email" name="email"
+              class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+              value="{{ form.email.value|default:'' }}" required>
           </div>
 
           <div class="form-group">
             <label class="form-label">Phone Number <span class="required">*</span></label>
-            <div class="input-icon">
-              <i class="fas fa-phone"></i>
-              <input type="tel" name="phone" class="form-control {% if form.phone.errors %}is-invalid{% endif %}"
-                value="{{ form.phone.value|default:'' }}" placeholder="+91 98765 43210" required>
-            </div>
-            {% if form.phone.errors %}
-            <div class="form-error">{{ form.phone.errors.0 }}</div>
-            {% endif %}
+            <input type="tel" name="phone"
+              class="form-control {% if form.phone.errors %}is-invalid{% endif %}"
+              value="{{ form.phone.value|default:'' }}" required>
           </div>
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
@@ -79,9 +64,7 @@
               <label class="form-label">Number of Travellers <span class="required">*</span></label>
               <input type="number" name="num_travellers" id="id_num_travellers"
                 class="form-control {% if form.num_travellers.errors %}is-invalid{% endif %}"
-                value="{{ form.num_travellers.value|default:1 }}" min="1" max="{{ package.max_group_size|default:10 }}"
-                required>
-              <div class="form-hint">Max {{ package.max_group_size|default:10 }} per booking</div>
+                value="{{ form.num_travellers.value|default:1 }}" min="1" required>
             </div>
 
             <div class="form-group">
@@ -89,9 +72,6 @@
               <input type="date" name="travel_date" id="id_travel_date"
                 class="form-control {% if form.travel_date.errors %}is-invalid{% endif %}"
                 value="{{ form.travel_date.value|default:'' }}" required>
-              {% if form.travel_date.errors %}
-              <div class="form-error">{{ form.travel_date.errors.0 }}</div>
-              {% endif %}
             </div>
           </div>
 
@@ -101,21 +81,14 @@
 {{ form.special_requests.value|default:'' }}</textarea>
           </div>
 
-          <!-- Terms -->
-          <div
-            style="background:var(--gray-50);border-radius:var(--radius);padding:1rem;margin-bottom:1.25rem;font-size:.82rem;color:var(--gray-600)">
-            <div style="display:flex;align-items:flex-start;gap:.6rem">
-              <input type="checkbox" id="terms" required style="margin-top:2px;accent-color:var(--saffron)">
-              <label for="terms">
-                I confirm all traveller details are correct and I agree to the
-                <a href="#" style="color:var(--saffron)">Terms & Cancellation Policy</a>.
-              </label>
-            </div>
+          <!-- TERMS -->
+          <div style="background:var(--gray-50);border-radius:var(--radius);padding:1rem;margin-bottom:1.25rem;font-size:.82rem;color:var(--gray-600)">
+            <input type="checkbox" required>
+            I agree to Terms & Cancellation Policy
           </div>
 
-          <button type="submit" class="btn btn-primary w-100"
-            style="justify-content:center;font-size:1rem;padding:.9rem">
-            Continue to Payment <i class="fas fa-arrow-right"></i>
+          <button type="submit" class="btn btn-primary w-100">
+            Continue to Payment
           </button>
         </form>
       </div>
@@ -125,28 +98,30 @@
         <h3>Booking Summary</h3>
 
         {% if package.main_image %}
-        <img src="{{ package.main_image.url }}" class="summary-pkg-img" alt="{{ package.title }}">
+        <img src="{{ package.main_image.url }}" class="summary-pkg-img">
         {% endif %}
 
         <div class="summary-pkg-title">{{ package.title }}</div>
 
-        <div style="font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:1.25rem">
-          {{ package.get_state_display }} · {{ package.duration_days }} Days
+        <div class="summary-row">
+          <span>Price per person</span>
+          <span>₹{{ package.discounted_price|default:0|floatformat:0 }}</span>
         </div>
 
         <div class="summary-row">
-          <span class="label">Price per person</span>
-          <span class="value">₹{{ package.discounted_price|default:0|floatformat:0 }}</span>
+          <span>Travellers</span>
+          <span id="summary-travellers">1</span>
         </div>
 
+        <!-- ✅ FIX: Savings row added -->
         <div class="summary-row">
-          <span class="label">Travellers</span>
-          <span class="value" id="summary-travellers">1</span>
+          <span>Savings</span>
+          <span id="summary-savings">₹0</span>
         </div>
 
         <div class="summary-total">
-          <span class="label">Total Amount</span>
-          <span class="value" id="booking-total">
+          <span>Total</span>
+          <span id="booking-total">
             ₹{{ package.discounted_price|default:0|floatformat:0 }}
           </span>
         </div>
@@ -159,35 +134,42 @@
 
 {% block extra_js %}
 <script>
-  (function () {
-    const pricePerPerson = {{ package.discounted_price|default:0 }};
-    const savingsPerPerson = {{ package.discount_savings|default:0 }};
+(function () {
 
-    const travellersInput = document.getElementById('id_num_travellers');
+  // ✅ FIX: safe package id handling
+  const packageIdEl = document.getElementById('package-id');
+  if (!packageIdEl) return;
+  const packageId = packageIdEl.value;
 
-    if (travellersInput) {
-      travellersInput.addEventListener('input', function () {
-        const n = parseInt(this.value) || 1;
+  const travellersInput = document.getElementById('id_num_travellers');
 
-        document.getElementById('summary-travellers').textContent = n;
+  function updatePrice(n) {
+    fetch(`/calculate-price/?package_id=${packageId}&travellers=${n}`)
+      .then(res => res.json())
+      .then(data => {
+
+        if (data.error) return;
+
+        document.getElementById('summary-travellers').textContent = data.travellers;
 
         document.getElementById('booking-total').textContent =
-          '₹' + (pricePerPerson * n).toLocaleString('en-IN');
+          '₹' + Number(data.total).toLocaleString('en-IN');
 
-        const savingsEl = document.getElementById('summary-savings');
-        if (savingsEl) {
-          savingsEl.textContent = '-₹' + (savingsPerPerson * n).toLocaleString('en-IN');
-        }
-      });
-    }
+        document.getElementById('summary-savings').textContent =
+          '-₹' + Number(data.discount).toLocaleString('en-IN');
 
-    // Set min date to tomorrow
-    const d = document.getElementById('id_travel_date');
-    if (d) {
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      d.min = tomorrow.toISOString().split('T')[0];
-    }
-  })();
+      })
+      .catch(err => console.error(err));
+  }
+
+  if (travellersInput) {
+    travellersInput.addEventListener('input', function () {
+      updatePrice(parseInt(this.value) || 1);
+    });
+
+    updatePrice(parseInt(travellersInput.value) || 1);
+  }
+
+})();
 </script>
 {% endblock %}

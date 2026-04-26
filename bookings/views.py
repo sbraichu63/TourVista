@@ -4,12 +4,15 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpResponse, JsonResponse
 import io
 
 from core.models import TourPackage
 from .models import Booking, Payment
 from .forms import BookingForm, PaymentForm
+
+
+
 
 
 @login_required
@@ -231,3 +234,30 @@ def download_receipt(request, booking_ref):
 
     except ImportError:
         return HttpResponse('PDF generation requires reportlab. Install it with: pip install reportlab', status=500)
+
+def calculate_price(request):
+    package_id = request.GET.get('package_id')
+    travellers = int(request.GET.get('travellers', 1))
+
+    try:
+        package = TourPackage.objects.get(id=package_id)
+        price = package.discounted_price or 0
+
+        discount = 0
+        if travellers >= 5:
+            discount = 0.10
+        elif travellers >= 3:
+            discount = 0.05
+
+        total = price * travellers
+        discount_amount = total * discount
+        final_total = total - discount_amount
+
+        return JsonResponse({
+            "total": final_total,
+            "discount": discount_amount,
+            "travellers": travellers
+        })
+
+    except TourPackage.DoesNotExist:
+        return JsonResponse({"error": "Invalid package"}, status=404)

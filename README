@@ -1,0 +1,146 @@
+# 🌍 TourVista – Tour Management System
+
+TourVista is a full-stack **Django-based Tour Management System** designed to simplify travel planning and booking. It allows users to explore tour packages, make bookings, and manage their travel experience efficiently through a modern web interface.
+
+This project demonstrates practical implementation of web development concepts including authentication, database management, and dynamic UI rendering.
+
+---
+
+## 🚀 Features
+
+* 🔐 User Authentication (Register/Login/Logout)
+* 🧳 Browse Travel Packages
+* 📅 Book & Manage Tours
+* 💳 Payment Interface (UI-based)
+* 📊 Admin Dashboard
+* 🗂️ Organized Tour Categories & Features
+* 🧾 Booking History & Receipt Generation
+
+---
+
+## 🛠️ Tech Stack
+
+**Frontend**
+
+* HTML5
+* CSS3
+* JavaScript
+
+**Backend**
+
+* Python
+* Django Framework
+
+**Database**
+
+* SQLite
+
+---
+
+## 📁 Project Structure
+
+```
+TourVista/
+│
+├── accounts/        # User authentication & profiles
+├── bookings/        # Booking logic and management
+├── core/            # Main app (home, about, etc.)
+├── features/        # Additional functionalities
+├── templates/       # HTML templates
+├── static/          # CSS, JS, images
+├── media/           # Uploaded files
+├── manage.py
+└── requirements.txt
+```
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1. Clone the repository
+
+```
+git clone https://github.com/sbraichu63/TourVista.git
+cd TourVista
+```
+
+### 2. Create virtual environment
+
+```
+python -m venv venv
+```
+
+### 3. Activate virtual environment
+
+```
+# Windows
+venv\Scripts\activate
+
+# Mac/Linux
+source venv/bin/activate
+```
+
+### 4. Install dependencies
+
+```
+pip install -r requirements.txt
+```
+
+### 5. Run migrations
+
+```
+python manage.py migrate
+```
+
+### 6. Start server
+
+```
+python manage.py runserver
+```
+
+### 7. Open in browser
+
+```
+http://127.0.0.1:8000/
+```
+
+---
+
+## 👨‍💻 Contributors
+
+* Suryansh Barnawal
+* Bhoomi Pandey
+* Abhishek Shahi
+
+---
+
+## 📌 Future Improvements
+
+* Online payment gateway integration
+* Email notifications
+* AI-based travel recommendations
+* Mobile responsiveness improvements
+
+---
+
+## 📄 License
+
+This project is for academic and learning purposes only.
+
+---
+
+## ⭐ Acknowledgement
+
+This project is inspired by modern travel platforms that aim to simplify trip planning by offering personalized and efficient solutions. Research shows that modern tour systems focus on customizable packages, booking integration, and improved user experience to enhance travel planning. ([Propulsion Tech Journal][1])
+
+---
+
+## 📬 Contact
+
+For any queries or suggestions:
+
+📧 Email: suryanshbarnawal890@gmail.com
+🌐 GitHub: https://github.com/sbraichu63
+
+[1]: https://www.propulsiontechjournal.com/index.php/journal/article/view/3137?utm_source=chatgpt.com "TourVista: Tour Guide Web Application | Tuijin Jishu/Journal of Propulsion Technology"
+

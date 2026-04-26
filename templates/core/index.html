@@ -6,11 +6,16 @@
 
 {% block content %}
 
-<!-- ── HERO ──────────────────────────────────────────────────────── -->
-<section class="hero" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.65)), url('{% static 'img/hero.jpg' %}') center/cover no-repeat fixed;">
-  
+<!-- HERO -->
+<section class="hero" style="
+  background:
+    linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.65)),
+    url('{% static "img/hero.jpg" %}') center/cover no-repeat;
+">
+
   <div class="container hero-content">
     <div style="max-width:700px" data-aos="fade-up">
+
       <div class="hero-badge">
         <span class="dot pulse"></span>
         🇮🇳 India's Premier Travel Platform
@@ -21,7 +26,9 @@
         <span class="highlight">Incredible India</span>
       </h1>
 
-      <p style="font-size:1.15rem;margin-bottom:2.5rem;opacity:.95">From the snow-capped peaks of Kashmir to the sun-kissed beaches of Goa — discover India's most breathtaking destinations with curated packages, expert guides, and memories that last a lifetime.</p>
+      <p style="font-size:1.15rem;margin-bottom:2.5rem;opacity:.95">
+        From Kashmir to Goa — explore India with curated packages and unforgettable experiences.
+      </p>
 
       <div class="hero-actions">
         <a href="{% url 'core:packages' %}" class="btn btn-primary btn-lg">
@@ -32,24 +39,29 @@
         </a>
       </div>
 
-      <!-- Search Bar -->
+      <!-- SEARCH -->
       <div class="hero-search" data-aos="fade-up" data-aos-delay="200">
         <div style="display:flex;align-items:center;flex:1;padding-left:1rem">
           <i class="fas fa-search" style="color:#9CA3AF;font-size:.9rem"></i>
-          <input type="text" placeholder="Where to go? (e.g. Jaipur, Goa)" id="hero-search-input" style="background:transparent;border:none">
+          <input type="text" id="hero-search-input" placeholder="Where to go?">
         </div>
+
         <div class="search-divider"></div>
-        <select id="hero-state-filter" style="background:transparent;border:none;padding:0 1rem;font-weight:600;color:var(--navy)">
+
+        <select id="hero-state-filter">
           <option value="">All States</option>
           {% for val, label in states %}
             <option value="{{ val }}">{{ label }}</option>
           {% endfor %}
         </select>
-        <button class="btn btn-primary btn-sm" onclick="heroSearch()" id="hero-search-btn" style="border-radius:10px;margin-right:.5rem">Search</button>
+
+        <button class="btn btn-primary btn-sm" id="hero-search-btn">
+          Search
+        </button>
       </div>
     </div>
 
-    <!-- Stats -->
+    <!-- STATS -->
     <div class="hero-stats" style="margin-top:4rem" data-aos="fade-up" data-aos-delay="400">
       <div class="hero-stat">
         <div class="number">{{ total_packages }}+</div>
@@ -65,336 +77,146 @@
       </div>
       <div class="hero-stat">
         <div class="number">4.8★</div>
-        <div class="label">TripAdvisor Rating</div>
+        <div class="label">Rating</div>
       </div>
     </div>
   </div>
-
-  <!-- Scroll indicator -->
-  <div class="scroll-indicator">
-    <span style="color:white;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700">Scroll</span>
-    <div class="scroll-line"></div>
-  </div>
 </section>
 
-<!-- ── FEATURED DESTINATIONS ─────────────────────────────────── -->
+<!-- DESTINATIONS -->
 <section class="section" style="background:var(--ivory)">
   <div class="container">
+
     <div class="section-header" data-aos>
-      <div class="badge-tag"><i class="fas fa-map-pin"></i> Top Destinations</div>
-      <h2>Where Will You Go Next?</h2>
-      <p>Handpicked destinations across India's diverse landscapes — from royal deserts to tropical backwaters.</p>
+      <h2>Top Destinations</h2>
     </div>
 
     <div class="dest-grid">
       {% for dest in featured_destinations %}
-      <a href="{% url 'core:packages' %}?state={{ dest.state }}" class="dest-card" data-aos data-aos-delay="{{ forloop.counter0|add:1 }}00">
+      <a href="{% url 'core:packages' %}?state={{ dest.state }}" class="dest-card">
+
         {% if dest.image %}
-          <img src="{{ dest.image.url }}" alt="{{ dest.name }}" loading="lazy">
+          <img src="{{ dest.image.url }}" alt="{{ dest.name }}">
         {% else %}
-          <!-- Gradient placeholder by state -->
-          {% with colors="linear-gradient(135deg,#B45309,#D97706)/linear-gradient(135deg,#1D4ED8,#0EA5E9)/linear-gradient(135deg,#065F46,#10B981)/linear-gradient(135deg,#1E3A5F,#3B82F6)/linear-gradient(135deg,#1A3A5C,#60A5FA)/linear-gradient(135deg,#7C3AED,#A78BFA)/linear-gradient(135deg,#BE185D,#F472B6)/linear-gradient(135deg,#0369A1,#38BDF8)" %}
-          <div class="dest-card-placeholder" style="background:{% cycle 'linear-gradient(135deg,#B45309,#D97706)' 'linear-gradient(135deg,#1D4ED8,#0EA5E9)' 'linear-gradient(135deg,#065F46,#10B981)' 'linear-gradient(135deg,#1E3A5F,#3B82F6)' 'linear-gradient(135deg,#7C3AED,#A78BFA)' 'linear-gradient(135deg,#BE185D,#F472B6)' 'linear-gradient(135deg,#0369A1,#38BDF8)' 'linear-gradient(135deg,#B45309,#D97706)' %};display:flex;align-items:center;justify-content:center;font-size:4rem">
-            {% cycle '🏰' '🏖️' '🌴' '🏔️' '❄️' '🌿' '🕌' '🐘' %}
-          </div>
-          {% endwith %}
+          <div class="dest-card-placeholder">🌍</div>
         {% endif %}
-        <div class="dest-card-overlay"></div>
+
         <div class="dest-card-info">
           <h3>{{ dest.name }}</h3>
           <span>{{ dest.get_state_display }}</span>
         </div>
+
       </a>
       {% empty %}
-      <!-- Placeholder cards when no destinations seeded -->
-      {% for item in "12345678" %}
-      <a href="{% url 'core:packages' %}" class="dest-card" data-aos data-aos-delay="{{ forloop.counter0 }}00">
-        {% with emojis="🏰🏖️🌴🏔️❄️🌿🕌🐘" %}
-        <div class="dest-card-placeholder" style="background:{% cycle 'linear-gradient(135deg,#B45309,#D97706)' 'linear-gradient(135deg,#1D4ED8,#0EA5E9)' 'linear-gradient(135deg,#065F46,#10B981)' 'linear-gradient(135deg,#1E3A5F,#3B82F6)' 'linear-gradient(135deg,#7C3AED,#A78BFA)' 'linear-gradient(135deg,#BE185D,#F472B6)' 'linear-gradient(135deg,#0369A1,#38BDF8)' 'linear-gradient(135deg,#B45309,#D97706)' %};display:flex;align-items:center;justify-content:center;font-size:4rem">
-          {% cycle '🏰' '🏖️' '🌴' '🏔️' '❄️' '🌿' '🕌' '🐘' %}
-        </div>
-        {% endwith %}
-        <div class="dest-card-overlay"></div>
-        <div class="dest-card-info">
-          <h3>{% cycle 'Rajasthan' 'Goa' 'Kerala' 'Manali' 'Kashmir' 'Rishikesh' 'Agra' 'Andaman' %}</h3>
-          <span>{% cycle 'The Royal State' 'Beach Paradise' "God's Own Country" 'Adventure Hub' 'Heaven on Earth' 'Yoga Capital' 'Taj Mahal City' 'Island Paradise' %}</span>
-        </div>
-      </a>
-      {% endfor %}
+      <p>No destinations available</p>
       {% endfor %}
     </div>
+
   </div>
 </section>
 
-<!-- ── FEATURED PACKAGES ──────────────────────────────────────── -->
+<!-- PACKAGES -->
 <section class="section">
   <div class="container">
-    <div class="section-header" data-aos>
-      <div class="badge-tag"><i class="fas fa-star"></i> Featured Packages</div>
-      <h2>Handpicked India Tours</h2>
-      <p>Our most popular and highly-rated packages, curated by travel experts just for you.</p>
+
+    <div class="section-header">
+      <h2>Featured Packages</h2>
     </div>
 
     <div class="packages-grid">
+
       {% for package in featured_packages %}
-      <div class="package-card" data-aos data-aos-delay="{{ forloop.counter0 }}00">
+      <div class="package-card">
+
+        <!-- IMAGE -->
         <div class="package-card-img">
           {% if package.main_image %}
-            <img src="{{ package.main_image.url }}" alt="{{ package.title }}" loading="lazy">
+            <img src="{{ package.main_image.url }}" alt="{{ package.title }}">
           {% else %}
-            <div class="img-placeholder">
-              {% cycle '🏰' '🏖️' '🌴' '🏔️' '❄️' '🌿' %}
-            </div>
+            <div class="img-placeholder">🏝️</div>
           {% endif %}
+
+          <!-- BADGES -->
           {% if package.discount_percent > 0 %}
             <span class="card-badge">{{ package.discount_percent }}% OFF</span>
-          {% elif package.is_featured %}
-            <span class="card-badge">⭐ Featured</span>
           {% endif %}
-          <button class="card-wishlist {% if package.pk in wishlist_ids %}active{% endif %}"
-            data-wishlist="{{ package.pk }}" title="Save to wishlist">
-            <i class="{% if package.pk in wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+
+          <!-- WISHLIST SAFE -->
+          <button class="card-wishlist {% if wishlist_ids and package.pk in wishlist_ids %}active{% endif %}">
+            <i class="{% if wishlist_ids and package.pk in wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
           </button>
         </div>
+
+        <!-- BODY -->
         <div class="package-card-body">
-          <div class="card-state"><i class="fas fa-map-pin"></i> {{ package.get_state_display }}</div>
-          <h3 class="card-title">{{ package.title }}</h3>
-          <div class="card-meta">
-            <span><i class="fas fa-moon"></i> {{ package.nights }}N / {{ package.duration_days }}D</span>
-            <span><i class="fas fa-users"></i> Max {{ package.max_group_size }}</span>
-            <span><i class="fas fa-sun"></i> {{ package.get_best_season_display }}</span>
-          </div>
-          {% if package.avg_rating > 0 %}
-          <div class="card-rating">
-            <div class="stars">
-              {% for i in "12345" %}
-                {% if forloop.counter <= package.avg_rating %}
-                  <i class="fas fa-star"></i>
-                {% else %}
-                  <i class="far fa-star"></i>
-                {% endif %}
-              {% endfor %}
-            </div>
-            <span style="font-weight:600;font-size:.85rem">{{ package.avg_rating }}</span>
-            <small>({{ package.review_count }} reviews)</small>
+          <h3>{{ package.title }}</h3>
+
+          <!-- RATING FIX -->
+          {% if package.avg_rating %}
+          <div>
+            {% for i in "12345" %}
+              {% if forloop.counter <= package.avg_rating|floatformat:0 %}
+                ★
+              {% else %}
+                ☆
+              {% endif %}
+            {% endfor %}
+            ({{ package.review_count }})
           </div>
           {% endif %}
-          <div class="card-footer">
-            <div class="card-price">
-              {% if package.discount_percent > 0 %}
-                <div class="original">₹{{ package.price_per_person|floatformat:0 }}</div>
-              {% endif %}
-              <div class="final">₹{{ package.discounted_price|floatformat:0 }}</div>
-              <div class="per">per person</div>
-            </div>
-            <a href="{{ package.get_absolute_url }}" class="btn btn-primary btn-sm">View Details</a>
+
+          <!-- PRICE -->
+          <div>
+            ₹{{ package.discounted_price|floatformat:0 }}
           </div>
+
+          <a href="{{ package.get_absolute_url }}" class="btn btn-primary btn-sm">
+            View
+          </a>
         </div>
+
       </div>
       {% empty %}
-      <div style="grid-column:1/-1;text-align:center;padding:3rem">
-        <div class="empty-icon">🌏</div>
-        <h3 style="font-family:var(--font-body);color:var(--gray-600)">No packages yet</h3>
-        <p style="margin-top:.5rem">Run <code>python manage.py seed_data</code> to add sample India packages.</p>
-        <a href="/admin/core/tourpackage/add/" class="btn btn-primary mt-4">Add Package</a>
-      </div>
+      <p>No packages yet</p>
       {% endfor %}
-    </div>
-
-    <div style="text-align:center;margin-top:3rem" data-aos>
-      <a href="{% url 'core:packages' %}" class="btn btn-outline btn-lg">
-        View All Packages <i class="fas fa-arrow-right"></i>
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- ── HOW IT WORKS ───────────────────────────────────────────── -->
-<section class="section" style="background:var(--navy)">
-  <div class="container">
-    <div class="section-header" data-aos>
-      <div class="badge-tag" style="background:rgba(255,107,53,.15);border-color:rgba(255,107,53,.3);color:#FF8C5A">
-        <i class="fas fa-route"></i> How It Works
-      </div>
-      <h2 style="color:white">Book Your Dream Trip in 4 Easy Steps</h2>
-      <p style="color:rgba(255,255,255,.6)">Simple, transparent, and hassle-free booking experience.</p>
-    </div>
-
-    <div class="steps-grid">
-      {% for step in "1234" %}
-      <div class="step-card" data-aos data-aos-delay="{{ forloop.counter0 }}50">
-        <div class="step-icon" style="background:rgba(255,{% cycle '107' '159' '107' '107' %},{% cycle '53' '11' '53' '53' %},.15)">
-          <i class="fas {% cycle 'fa-search-location' 'fa-calendar-check' 'fa-credit-card' 'fa-plane-departure' %}" style="color:{% cycle '#FF6B35' '#F59E0B' '#3B82F6' '#10B981' %}"></i>
-          <div class="step-num">{{ forloop.counter }}</div>
-        </div>
-        <h3 style="color:white">{% cycle 'Explore' 'Book' 'Pay Securely' 'Travel!' %}</h3>
-        <p style="color:rgba(255,255,255,.55);font-size:.88rem">
-          {% cycle 'Browse 10+ curated India packages filtered by destination, budget and season.' 'Select dates, number of travellers, and fill your booking details in minutes.' 'Pay via UPI, Credit/Debit Card, or Net Banking with 256-bit encryption.' 'Get your confirmed e-ticket and explore Incredible India with our expert support.' %}
-        </p>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-
-<!-- ── BUDGET CALCULATOR ─────────────────────────────────────── -->
-<section class="section" style="background:var(--ivory)">
-  <div class="container">
-    <div style="display:grid;grid-template-columns:1fr 1.3fr;gap:3rem;align-items:center">
-
-      <div data-aos="fade-right">
-        <div class="badge-tag" style="margin-bottom:1rem"><i class="fas fa-calculator"></i> Budget Planner</div>
-        <h2>Plan Your India Trip Budget</h2>
-        <p style="margin-top:.75rem;font-size:1.05rem">Use our AI-powered budget estimator to get a realistic cost breakdown for your dream India trip — hotels, food, transport, and activities.</p>
-
-        <div style="margin-top:2rem;display:flex;flex-direction:column;gap:.75rem">
-          <div style="display:flex;align-items:center;gap:.75rem;font-size:.9rem;color:var(--gray-600)">
-            <div style="width:36px;height:36px;background:rgba(255,107,53,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--saffron)"><i class="fas fa-check"></i></div>
-            Instant cost breakdown by category
-          </div>
-          <div style="display:flex;align-items:center;gap:.75rem;font-size:.9rem;color:var(--gray-600)">
-            <div style="width:36px;height:36px;background:rgba(255,107,53,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--saffron)"><i class="fas fa-check"></i></div>
-            Covers 15+ Indian states
-          </div>
-          <div style="display:flex;align-items:center;gap:.75rem;font-size:.9rem;color:var(--gray-600)">
-            <div style="width:36px;height:36px;background:rgba(255,107,53,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--saffron)"><i class="fas fa-check"></i></div>
-            Budget, Standard & Luxury options
-          </div>
-        </div>
-      </div>
-
-      <div data-aos="fade-left">
-        <div class="budget-calc" id="budget-form">
-          <h3 style="font-family:var(--font-body);font-size:1.1rem;font-weight:800;margin-bottom:1.5rem;color:var(--navy);display:flex;align-items:center;gap:0.75rem">
-            <div style="width:32px;height:32px;background:var(--saffron);color:white;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.9rem">
-              <i class="fas fa-coins"></i>
-            </div>
-            Budget Estimator
-          </h3>
-
-          <div class="form-group">
-            <label class="form-label"><i class="fas fa-map-marker-alt" style="color:var(--saffron);width:20px"></i> Destination</label>
-            <select class="form-control" id="b-dest">
-              <option value="rajasthan">Rajasthan</option>
-              <option value="goa">Goa</option>
-              <option value="kerala">Kerala</option>
-              <option value="himachal_pradesh">Himachal Pradesh</option>
-              <option value="kashmir">Kashmir</option>
-              <option value="uttarakhand">Uttarakhand</option>
-              <option value="andaman">Andaman Islands</option>
-              <option value="default">Other India</option>
-            </select>
-          </div>
-
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
-            <div class="form-group">
-              <label class="form-label"><i class="fas fa-calendar-alt" style="color:var(--saffron);width:20px"></i> Duration</label>
-              <div style="font-weight:700;color:var(--navy);font-size:0.9rem;margin-bottom:0.25rem" id="b-days-val">5 days</div>
-              <input type="range" class="budget-slider" id="b-days" min="2" max="15" value="5">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label"><i class="fas fa-users" style="color:var(--saffron);width:20px"></i> Travellers</label>
-              <div style="font-weight:700;color:var(--navy);font-size:0.9rem;margin-bottom:0.25rem" id="b-trav-val">2 people</div>
-              <input type="range" class="budget-slider" id="b-travellers" min="1" max="10" value="2">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label"><i class="fas fa-hotel" style="color:var(--saffron);width:20px"></i> Comfort Level</label>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem">
-              <button type="button" class="btn btn-outline btn-sm b-accom-btn active" data-value="budget">Budget</button>
-              <button type="button" class="btn btn-outline btn-sm b-accom-btn" data-value="standard">Standard</button>
-              <button type="button" class="btn btn-outline btn-sm b-accom-btn" data-value="luxury">Luxury</button>
-            </div>
-            <input type="hidden" id="b-accom" value="budget">
-          </div>
-
-          <div class="budget-result">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start">
-              <div>
-                <div style="font-size:.75rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:1px;font-weight:700">Estimated Total</div>
-                <div class="budget-total" id="budget-total">₹–</div>
-              </div>
-              <div style="text-align:right">
-                <div id="budget-per-person" style="font-size:.85rem;color:rgba(255,255,255,.8);font-weight:600">₹– per person</div>
-              </div>
-            </div>
-            <div class="budget-bars" id="budget-bars">
-              <!-- Bars will be injected here -->
-            </div>
-          </div>
-        </div>
-      </div>
 
     </div>
-  </div>
-</section>
 
-<!-- ── TESTIMONIALS ───────────────────────────────────────────── -->
-<section class="section">
-  <div class="container">
-    <div class="section-header" data-aos>
-      <div class="badge-tag"><i class="fas fa-heart"></i> Traveller Stories</div>
-      <h2>What Our Travellers Say</h2>
-      <p>Real experiences from real travellers who explored India with us.</p>
-    </div>
-
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem">
-      {% for t in "123" %}
-      <div class="testimonial-card" data-aos data-aos-delay="{{ forloop.counter0 }}00">
-        <div class="testimonial-rating">
-          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-        </div>
-        <p class="testimonial-text">
-          {% cycle '"The Rajasthan Royal Heritage Tour was absolutely phenomenal! The heritage hotels, camel safari at Jaisalmer, and the magnificent Amber Fort — everything was perfectly organized. TourVista\'s attention to detail is unmatched!"' '"Our Kerala trip exceeded all expectations. The houseboat experience on Alleppey backwaters was magical — waking up to misty waters and lush greenery. The Ayurvedic massage was the cherry on top!"' '"Kashmir truly is Heaven on Earth! The shikara ride on Dal Lake at sunset, Gulmarg\'s gondola with panoramic Himalayan views — I\'m still dreaming about it. Booking through TourVista was seamless!"' %}
-        </p>
-        <div class="testimonial-user">
-          <div class="testimonial-avatar">{% cycle 'P' 'A' 'R' %}</div>
-          <div>
-            <div class="testimonial-name">{% cycle 'Priya Sharma' 'Arjun Mehta' 'Rahul Gupta' %}</div>
-            <div class="testimonial-trip">{% cycle 'Rajasthan Tour, 2024' 'Kerala Backwaters, 2024' 'Kashmir Package, 2025' %}</div>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-
-<!-- ── CTA BANNER ─────────────────────────────────────────────── -->
-<section style="background:linear-gradient(135deg,var(--saffron) 0%,var(--saffron-dark) 50%,#C43E10 100%);padding:5rem 0;text-align:center">
-  <div class="container" data-aos>
-    <h2 style="color:white;font-size:clamp(1.8rem,4vw,3rem);margin-bottom:1rem">Ready to Discover India?</h2>
-    <p style="color:rgba(255,255,255,.85);font-size:1.1rem;margin-bottom:2rem;max-width:520px;margin-left:auto;margin-right:auto">
-      Join thousands of happy travellers. Start your incredible India journey today.
-    </p>
-    {% if user.is_authenticated %}
-      <a href="{% url 'core:packages' %}" class="btn btn-white btn-lg">
-        <i class="fas fa-suitcase-rolling"></i> Browse Packages
-      </a>
-    {% else %}
-      <a href="{% url 'accounts:register' %}" class="btn btn-white btn-lg">
-        <i class="fas fa-user-plus"></i> Sign Up Free — It's Quick!
-      </a>
-    {% endif %}
   </div>
 </section>
 
 {% endblock %}
 
 {% block extra_js %}
+
 <script>
-function heroSearch() {
-  const q = document.getElementById('hero-search-input').value;
-  const state = document.getElementById('hero-state-filter').value;
-  let url = '{% url "core:packages" %}?';
-  if (q) url += 'q=' + encodeURIComponent(q) + '&';
-  if (state) url += 'state=' + encodeURIComponent(state);
-  window.location.href = url;
-}
-document.getElementById('hero-search-input').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') heroSearch();
+document.addEventListener("DOMContentLoaded", function () {
+
+  function heroSearch() {
+    const q = document.getElementById('hero-search-input').value.trim();
+    const state = document.getElementById('hero-state-filter').value;
+
+    if (!q && !state) {
+      alert("Enter destination or select a state");
+      return;
+    }
+
+    let url = '{% url "core:packages" %}?';
+
+    if (q) url += 'q=' + encodeURIComponent(q) + '&';
+    if (state) url += 'state=' + encodeURIComponent(state);
+
+    document.getElementById('hero-search-btn').innerText = "Searching...";
+    window.location.href = url;
+  }
+
+  document.getElementById('hero-search-btn').addEventListener('click', heroSearch);
+
+  document.getElementById('hero-search-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') heroSearch();
+  });
+
 });
 </script>
+
 {% endblock %}

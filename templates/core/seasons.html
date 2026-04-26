@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}India Travel Seasons Guide{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div class="container">
+    <div class="badge-tag" style="background:rgba(255,255,255,.12);color:white;border-color:rgba(255,255,255,.25);margin-bottom:1rem">🌤️ Travel Guide</div>
+    <h1>Best Time to Visit India</h1>
+    <p>Plan your perfect India trip — know the seasons, the festivals, and the ideal time for each destination.</p>
+  </div>
+</div>
+
+<section class="section" style="background:var(--ivory)">
+  <div class="container">
+    <div class="section-header" data-aos>
+      <h2>India's Four Travel Seasons</h2>
+      <p>India's diverse geography means different regions peak in different seasons. Here's your complete guide.</p>
+    </div>
+
+    <div class="season-grid">
+      <!-- Winter -->
+      <div class="season-card" data-aos>
+        <div class="season-card-header" style="background:linear-gradient(135deg,#1E3A5F,#0A7EA4)">
+          <div class="icon">❄️</div>
+          <h3>Winter Peak Season</h3>
+          <p><strong>October – February</strong></p>
+          <p>The best time to visit most of India. Pleasant temperatures, clear skies, major festivals, and peak tourist activity.</p>
+        </div>
+        <div class="season-card-body">
+          <div style="font-size:.82rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">Best Destinations</div>
+          <div class="season-dest">
+            <span>🏰 Rajasthan</span><span>🏖️ Goa</span><span>🕌 Agra (Taj Mahal)</span>
+            <span>🌺 Kerala</span><span>🐘 Karnataka</span><span>🌊 Andaman</span>
+          </div>
+          <div style="margin-top:.9rem;font-size:.83rem;color:var(--gray-600)"><strong>Avg Temp:</strong> 12–25°C</div>
+          <div style="font-size:.83rem;color:var(--gray-600)"><strong>Festivals:</strong> Diwali, Christmas, Pushkar Fair, Rann Utsav</div>
+        </div>
+      </div>
+
+      <!-- Summer -->
+      <div class="season-card" data-aos data-aos-delay="100">
+        <div class="season-card-header" style="background:linear-gradient(135deg,#B45309,#F59E0B)">
+          <div class="icon">☀️</div>
+          <h3>Summer — Hill Stations</h3>
+          <p><strong>March – June</strong></p>
+          <p>Hot in plains, perfect for hills! Escape to Himalayas, Western Ghats hill stations. Adventure season in mountains.</p>
+        </div>
+        <div class="season-card-body">
+          <div style="font-size:.82rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">Best Destinations</div>
+          <div class="season-dest">
+            <span>🏔️ Manali</span><span>🌲 Shimla</span><span>🍵 Darjeeling</span>
+            <span>🌿 Ooty</span><span>☕ Coorg</span><span>⛷️ Gulmarg</span>
+          </div>
+          <div style="margin-top:.9rem;font-size:.83rem;color:var(--gray-600)"><strong>Avg Temp:</strong> Hills 10–20°C, Plains 35–45°C</div>
+          <div style="font-size:.83rem;color:var(--gray-600)"><strong>Festivals:</strong> Holi, Baisakhi, Summer Treks</div>
+        </div>
+      </div>
+
+      <!-- Monsoon -->
+      <div class="season-card" data-aos data-aos-delay="200">
+        <div class="season-card-header" style="background:linear-gradient(135deg,#065F46,#10B981)">
+          <div class="icon">🌧️</div>
+          <h3>Monsoon — Lush & Green</h3>
+          <p><strong>July – September</strong></p>
+          <p>India transforms into a lush green paradise. Perfect for budget travel, waterfalls, and Kerala / Northeast.</p>
+        </div>
+        <div class="season-card-body">
+          <div style="font-size:.82rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">Best Destinations</div>
+          <div class="season-dest">
+            <span>🌴 Kerala</span><span>🌺 Coorg</span><span>💧 Meghalaya</span>
+            <span>🌿 Assam</span><span>🏔️ Ladakh (Rain Shadow)</span><span>🏰 Mysore</span>
+          </div>
+          <div style="margin-top:.9rem;font-size:.83rem;color:var(--gray-600)"><strong>Avg Temp:</strong> 24–32°C</div>
+          <div style="font-size:.83rem;color:var(--gray-600)"><strong>Festivals:</strong> Onam, Raksha Bandhan, Ganesh Chaturthi</div>
+        </div>
+      </div>
+
+      <!-- Post-Monsoon -->
+      <div class="season-card" data-aos data-aos-delay="300">
+        <div class="season-card-header" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">
+          <div class="icon">🌅</div>
+          <h3>Post-Monsoon — Festive</h3>
+          <p><strong>September – October</strong></p>
+          <p>Transition season with clear skies, greenery, festivals, and comfortable temperatures everywhere in India.</p>
+        </div>
+        <div class="season-card-body">
+          <div style="font-size:.82rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">Best Destinations</div>
+          <div class="season-dest">
+            <span>🐅 Jim Corbett</span><span>🦁 Ranthambore</span><span>🧘 Rishikesh</span>
+            <span>❄️ Kashmir</span><span>🏖️ Goa (Starting)</span><span>🌄 Sikkim</span>
+          </div>
+          <div style="margin-top:.9rem;font-size:.83rem;color:var(--gray-600)"><strong>Avg Temp:</strong> 18–28°C</div>
+          <div style="font-size:.83rem;color:var(--gray-600)"><strong>Festivals:</strong> Navratri, Dussehra, Diwali</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Festival Calendar -->
+<section class="section">
+  <div class="container">
+    <div class="section-header" data-aos>
+      <div class="badge-tag"><i class="fas fa-calendar-star"></i> Festival Calendar</div>
+      <h2>Major India Festivals by Month</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem">
+      {% for item in "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec" %}
+      <div style="background:white;border-radius:var(--radius);padding:1.1rem;box-shadow:var(--shadow-sm);border:1px solid var(--gray-100)" data-aos>
+        <div style="font-size:.72rem;font-weight:800;color:var(--saffron);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem">{{ item }}</div>
+        <div style="font-size:.9rem;font-weight:700;color:var(--navy)">
+          {% cycle 'Republic Day, Lohri' 'Vasant Panchami' 'Holi, Ugadi' 'Baisakhi, Ram Navami' 'Buddha Purnima' 'Eid ul-Fitr' 'Rath Yatra' 'Raksha Bandhan' 'Onam, Ganesh Chaturthi' 'Navratri, Dussehra, Diwali' 'Chhath Puja' 'Christmas, New Year' %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section style="background:linear-gradient(135deg,var(--navy),var(--teal-dark));padding:4rem 0;text-align:center">
+  <div class="container" data-aos>
+    <h2 style="color:white;margin-bottom:.75rem">Find Your Perfect Season</h2>
+    <p style="color:rgba(255,255,255,.7);margin-bottom:1.5rem">Browse packages filtered by best travel season</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="{% url 'core:packages' %}?season=winter" class="btn btn-white">❄️ Winter Packages</a>
+      <a href="{% url 'core:packages' %}?season=summer" class="btn" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3)">☀️ Summer Packages</a>
+      <a href="{% url 'core:packages' %}?season=monsoon" class="btn" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3)">🌧️ Monsoon Packages</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

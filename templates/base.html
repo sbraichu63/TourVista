@@ -1,0 +1,263 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="{% block meta_description %}TourVista India — Discover Incredible India with curated tour packages, expert guides, and unforgettable experiences.{% endblock %}">
+  <title>{% block title %}TourVista India{% endblock %} | Your Gateway to Incredible India</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}"
+    onerror="this.href='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'><text y=\'28\' font-size=\'28\'>🌏</text></svg>'">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap"
+    rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+  <!-- Leaflet Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <!-- AOS Animations -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+  <!-- ── NAVBAR ─────────────────────────────────────────────────── -->
+  <nav class="navbar {% block navbar_class %}solid{% endblock %}" id="main-navbar">
+    <div class="container" style="display:flex;align-items:center;width:100%;gap:2rem">
+
+      <!-- Brand -->
+      <a href="{% url 'core:home' %}" class="nav-brand" style="display:flex;align-items:center;gap:.75rem">
+        <img src="{% static 'img/logo.png' %}" alt="TourVista"
+          style="height:40px;width:auto;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))">
+        <span style="font-family:'Playfair Display',serif;font-weight:700;letter-spacing:-0.02em">Tour<span
+            style="color:var(--saffron)">Vista</span></span>
+      </a>
+
+      <!-- Links -->
+      <div class="nav-links">
+        <a href="{% url 'core:home' %}" {% if request.resolver_match.url_name == 'home' %}class="active" {% endif %}>Home</a>
+        <a href="{% url 'core:packages' %}" {% if 'package' in request.resolver_match.url_name %}class="active" {% endif %}>Packages</a>
+        <a href="{% url 'core:explore_map' %}">Explore Map</a>
+        <a href="{% url 'core:seasons' %}">Seasons</a>
+        <a href="{% url 'core:about' %}">About</a>
+      </div>
+
+      <!-- Actions -->
+      <div class="nav-actions" style="margin-left:auto;flex-shrink:0">
+        {% if user.is_authenticated %}
+        <div class="nav-dropdown">
+          <div class="nav-avatar" title="{{ user.username }}">
+            {% if user.first_name %}{{ user.first_name.0|upper }}{% else %}{{ user.username.0|upper }}{% endif %}
+          </div>
+          <div class="nav-dropdown-menu">
+            <a href="{% url 'accounts:dashboard' %}"><i class="fas fa-th-large"></i> My Dashboard</a>
+            <a href="{% url 'accounts:profile_update' %}"><i class="fas fa-user-edit"></i> Edit Profile</a>
+            {% if user.is_staff %}
+            <a href="{% url 'accounts:admin_dashboard' %}" style="color:var(--saffron); font-weight:700"><i
+                class="fas fa-shield-alt"></i> Admin Dashboard</a>
+            <a href="/admin/"><i class="fas fa-database"></i> Django Admin</a>
+            {% endif %}
+            <div class="divider"></div>
+            <a href="{% url 'accounts:logout' %}"
+              onclick="event.preventDefault();document.getElementById('logout-frm').submit()">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+          </div>
+        </div>
+        <form id="logout-frm" action="{% url 'accounts:logout' %}" method="post" style="display:none">{% csrf_token %}
+        </form>
+        {% else %}
+        <a href="{% url 'accounts:login' %}" class="btn btn-outline btn-sm"
+          style="color:white;border-color:rgba(255,255,255,.4)">Login</a>
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm">Sign Up Free</a>
+        {% endif %}
+      </div>
+
+      <!-- Hamburger -->
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="{% url 'core:home' %}"><i class="fas fa-home" style="width:20px"></i> Home</a>
+    <a href="{% url 'core:packages' %}"><i class="fas fa-suitcase" style="width:20px"></i> Packages</a>
+    <a href="{% url 'core:explore_map' %}"><i class="fas fa-map" style="width:20px"></i> Explore Map</a>
+    <a href="{% url 'core:seasons' %}"><i class="fas fa-cloud-sun" style="width:20px"></i> Seasons</a>
+    <a href="{% url 'core:about' %}"><i class="fas fa-info-circle" style="width:20px"></i> About</a>
+    <div class="mobile-divider"></div>
+    {% if user.is_authenticated %}
+    <a href="{% url 'accounts:dashboard' %}"><i class="fas fa-th-large" style="width:20px"></i> Dashboard</a>
+    <a href="#" onclick="document.getElementById('logout-frm').submit()"><i class="fas fa-sign-out-alt"
+        style="width:20px"></i> Logout</a>
+    {% else %}
+    <a href="{% url 'accounts:login' %}"><i class="fas fa-sign-in-alt" style="width:20px"></i> Login</a>
+    <a href="{% url 'accounts:register' %}"><i class="fas fa-user-plus" style="width:20px"></i> Register</a>
+    {% endif %}
+  </div>
+
+  <!-- Django Messages → JS Toasts -->
+  {% if messages %}
+  {% for message in messages %}
+  <div class="django-message" data-message="{{ message|escapejs }}" data-type="{{ message.tags }}" style="display:none">
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  <!-- ── PAGE CONTENT ─────────────────────────────────────────── -->
+  {% block content %}{% endblock %}
+
+  <!-- ── FOOTER ─────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+
+        <div class="footer-brand">
+          <h3>Tour<span>Vista</span> India</h3>
+          <p>Your trusted travel companion for exploring the beauty, heritage, and diversity of Incredible India.
+            Curated tours. Unforgettable memories. 🇮🇳</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="{% url 'core:home' %}">Home</a></li>
+            <li><a href="{% url 'core:packages' %}">All Packages</a></li>
+            <li><a href="{% url 'core:explore_map' %}">Explore Map</a></li>
+            <li><a href="{% url 'core:seasons' %}">Travel Seasons</a></li>
+            <li><a href="{% url 'core:about' %}">About Us</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Destinations</h4>
+          <ul>
+            <li><a href="{% url 'core:packages' %}?state=rajasthan">Rajasthan</a></li>
+            <li><a href="{% url 'core:packages' %}?state=goa">Goa</a></li>
+            <li><a href="{% url 'core:packages' %}?state=kerala">Kerala</a></li>
+            <li><a href="{% url 'core:packages' %}?state=kashmir">Kashmir</a></li>
+            <li><a href="{% url 'core:packages' %}?state=himachal_pradesh">Himachal Pradesh</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="{% url 'accounts:dashboard' %}">My Bookings</a></li>
+            <li><a href="#">Cancellation Policy</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="mailto:support@tourvista.in"><i class="fas fa-envelope"
+                  style="margin-right:.3rem;color:#FF6B35"></i>support@tourvista.in</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+        <span>© {% now "Y" %} TourVista India.</span>
+        <span>Made in India </span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ── AI CHATBOT BUBBLE ──────────────────────────────────────── -->
+  <div class="chatbot-bubble">
+
+    <!-- CHAT WINDOW -->
+    <div class="chatbot-window" id="chatbot-window" role="dialog" aria-labelledby="chatbot-title" aria-hidden="true">
+
+      <!-- HEADER -->
+      <div class="chatbot-header">
+        <div class="chatbot-avatar" aria-hidden="true">🌏</div>
+
+        <div class="chatbot-header-info">
+          <h4 id="chatbot-title">Vistara</h4>
+          <span class="status online">Online Assistant</span>
+        </div>
+
+        <div class="chatbot-controls">
+          <button class="chat-ctrl-btn" id="chatbot-clear" title="Clear Chat">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+          <button class="chat-ctrl-btn" id="chatbot-close" title="Minimize">
+            <i class="fas fa-minus"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- MESSAGES -->
+      <div class="chatbot-messages" id="chatbot-messages" role="log" aria-live="polite">
+        <!-- Messages will be injected here -->
+      </div>
+
+      <!-- QUICK REPLIES CONTAINER -->
+      <div id="chatbot-quick-replies" class="quick-replies"></div>
+
+      <!-- INPUT -->
+      <div class="chatbot-input">
+        <input type="text" id="chatbot-input" placeholder="Ask me anything about India..."
+          autocomplete="off" aria-label="Type your message">
+
+        <button class="chatbot-send" id="chatbot-send" aria-label="Send message">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- TOGGLE BUTTON -->
+    <button class="chatbot-toggle" id="chatbot-toggle" aria-label="Open chat assistant" aria-expanded="false">
+      <i class="fas fa-comments"></i>
+    </button>
+
+  </div>
+
+
+  <!-- Library Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Main JS -->
+  <script src="{% static 'js/main.js' %}"></script>
+  <script>
+    // Initialize AOS
+    document.addEventListener('DOMContentLoaded', function () {
+      AOS.init({
+        duration: 800,
+        offset: 100,
+        once: true,
+        easing: 'ease-out-quad'
+      });
+    });
+  </script>
+  {% block extra_js %}{% endblock %}
+
+</body>
+
+</html>

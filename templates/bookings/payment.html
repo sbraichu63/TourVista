@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Payment — {{ booking.booking_ref }}{% endblock %}
+
+{% block content %}
+<div class="booking-page">
+  <div class="container">
+    <h2 style="margin-bottom:1.5rem">Secure Payment</h2>
+    <div class="booking-layout">
+
+      <!-- PAYMENT FORM -->
+      <div class="booking-card">
+        <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--gray-100)">
+          <div style="width:40px;height:40px;background:rgba(16,185,129,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--success)"><i class="fas fa-lock"></i></div>
+          <div>
+            <div style="font-weight:700;color:var(--navy);font-size:.95rem">256-bit SSL Encrypted Payment</div>
+            <div style="font-size:.78rem;color:var(--gray-500)">Your payment info is completely secure</div>
+          </div>
+        </div>
+
+        <form method="post" id="payment-form" novalidate>
+          {% csrf_token %}
+          <h3 style="font-family:var(--font-body);font-size:1rem;font-weight:700;margin-bottom:1rem">Choose Payment Method</h3>
+
+          <div class="payment-methods">
+            <!-- UPI -->
+            <div class="payment-method-card selected" data-method="upi" onclick="selectMethod('upi',this)">
+              <input type="radio" name="method" value="upi" checked>
+              <div class="payment-method-icon">📱</div>
+              <div>
+                <div class="payment-method-label">UPI</div>
+                <div class="payment-method-sub">Pay via Google Pay, PhonePe, Paytm</div>
+              </div>
+              <div style="margin-left:auto;display:flex;gap:.3rem">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/200px-Paytm_Logo_%28standalone%29.svg.png" style="height:22px;object-fit:contain;opacity:.8" alt="Paytm">
+              </div>
+            </div>
+            <!-- Card -->
+            <div class="payment-method-card" data-method="card" onclick="selectMethod('card',this)">
+              <input type="radio" name="method" value="card">
+              <div class="payment-method-icon">💳</div>
+              <div>
+                <div class="payment-method-label">Credit / Debit Card</div>
+                <div class="payment-method-sub">Visa, Mastercard, RuPay</div>
+              </div>
+            </div>
+            <!-- Net Banking -->
+            <div class="payment-method-card" data-method="netbanking" onclick="selectMethod('netbanking',this)">
+              <input type="radio" name="method" value="netbanking">
+              <div class="payment-method-icon">🏦</div>
+              <div>
+                <div class="payment-method-label">Net Banking</div>
+                <div class="payment-method-sub">SBI, HDFC, ICICI, Axis & more</div>
+              </div>
+            </div>
+            <!-- Wallet -->
+            <div class="payment-method-card" data-method="wallet" onclick="selectMethod('wallet',this)">
+              <input type="radio" name="method" value="wallet">
+              <div class="payment-method-icon">👛</div>
+              <div>
+                <div class="payment-method-label">Digital Wallet</div>
+                <div class="payment-method-sub">Amazon Pay, MobiKwik, Freecharge</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- UPI Fields -->
+          <div class="payment-fields active" id="fields-upi">
+            <div class="form-group">
+              <label class="form-label">UPI ID <span class="required">*</span></label>
+              <div class="input-icon">
+                <i class="fas fa-at"></i>
+                <input type="text" name="upi_id" id="id_upi_id" class="form-control" placeholder="yourname@paytm / @gpay / @ybl">
+              </div>
+              <div class="form-hint">Enter your UPI ID linked to any bank account</div>
+            </div>
+            <div style="background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:1px solid #BBF7D0;border-radius:var(--radius);padding:1rem;font-size:.85rem;color:#166534;display:flex;gap:.6rem;align-items:center">
+              <i class="fas fa-info-circle"></i>
+              You'll receive a payment request on your UPI app. Approve it to confirm booking.
+            </div>
+          </div>
+
+          <!-- Card Fields -->
+          <div class="payment-fields" id="fields-card">
+            <div class="form-group">
+              <label class="form-label">Cardholder Name <span class="required">*</span></label>
+              <input type="text" name="card_name" id="id_card_name" class="form-control" placeholder="Name as on card">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Card Number <span class="required">*</span></label>
+              <div class="input-icon">
+                <i class="fas fa-credit-card"></i>
+                <input type="text" name="card_number" id="id_card_number" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19">
+              </div>
+            </div>
+            <div class="card-input-grid">
+              <div class="form-group">
+                <label class="form-label">Expiry Date</label>
+                <input type="text" name="card_expiry" id="id_card_expiry" class="form-control" placeholder="MM/YY" maxlength="5">
+              </div>
+              <div class="form-group">
+                <label class="form-label">CVV</label>
+                <input type="password" name="card_cvv" id="id_card_cvv" class="form-control" placeholder="•••" maxlength="4">
+              </div>
+            </div>
+          </div>
+
+          <!-- Net Banking Fields -->
+          <div class="payment-fields" id="fields-netbanking">
+            <div class="form-group">
+              <label class="form-label">Select Bank</label>
+              <select class="form-control">
+                <option value="">-- Select your bank --</option>
+                <option>State Bank of India (SBI)</option>
+                <option>HDFC Bank</option>
+                <option>ICICI Bank</option>
+                <option>Axis Bank</option>
+                <option>Kotak Mahindra Bank</option>
+                <option>Punjab National Bank (PNB)</option>
+                <option>Bank of Baroda</option>
+                <option>Other Banks</option>
+              </select>
+            </div>
+            <div style="background:var(--cream);border-radius:var(--radius);padding:1rem;font-size:.85rem;color:var(--gray-600)">
+              You'll be redirected to your bank's secure portal to complete payment.
+            </div>
+          </div>
+
+          <!-- Wallet Fields -->
+          <div class="payment-fields" id="fields-wallet">
+            <div class="form-group">
+              <label class="form-label">Select Wallet</label>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+                <label style="border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:.75rem;display:flex;align-items:center;gap:.6rem;cursor:pointer;transition:border-color .2s">
+                  <input type="radio" name="wallet_provider" value="Amazon Pay" style="accent-color:var(--saffron)" checked>
+                  <span style="font-size:.88rem;font-weight:500">Amazon Pay</span>
+                </label>
+                <label style="border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:.75rem;display:flex;align-items:center;gap:.6rem;cursor:pointer;transition:border-color .2s">
+                  <input type="radio" name="wallet_provider" value="MobiKwik" style="accent-color:var(--saffron)">
+                  <span style="font-size:.88rem;font-weight:500">MobiKwik</span>
+                </label>
+                <label style="border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:.75rem;display:flex;align-items:center;gap:.6rem;cursor:pointer;transition:border-color .2s">
+                  <input type="radio" name="wallet_provider" value="Freecharge" style="accent-color:var(--saffron)">
+                  <span style="font-size:.88rem;font-weight:500">Freecharge</span>
+                </label>
+                <label style="border:1.5px solid var(--gray-200);border-radius:var(--radius);padding:.75rem;display:flex;align-items:center;gap:.6rem;cursor:pointer;transition:border-color .2s">
+                  <input type="radio" name="wallet_provider" value="Airtel Payments" style="accent-color:var(--saffron)">
+                  <span style="font-size:.88rem;font-weight:500">Airtel Payments</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100" style="justify-content:center;font-size:1rem;padding:.9rem;margin-top:1.25rem" id="pay-btn">
+            <span id="btn-text"><i class="fas fa-lock"></i> Pay ₹{{ booking.total_amount|floatformat:0 }} Securely</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- SUMMARY -->
+      <div class="booking-summary">
+        <h3>Order Summary</h3>
+        {% if booking.package.main_image %}
+        <img src="{{ booking.package.main_image.url }}" class="summary-pkg-img" alt="{{ booking.package.title }}">
+        {% else %}
+        <div style="width:100%;height:140px;background:rgba(255,255,255,.08);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:3.5rem;margin-bottom:1.25rem">🌏</div>
+        {% endif %}
+        <div class="summary-pkg-title">{{ booking.package.title }}</div>
+        <div style="font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:1.25rem">{{ booking.package.get_state_display }}</div>
+
+        <div class="summary-row"><span class="label">Booking Ref</span><span class="value" style="color:var(--saffron-light)">#{{ booking.booking_ref }}</span></div>
+        <div class="summary-row"><span class="label">Travellers</span><span class="value">{{ booking.num_travellers }}</span></div>
+        <div class="summary-row"><span class="label">Travel Date</span><span class="value">{{ booking.travel_date|date:"d M Y" }}</span></div>
+        <div class="summary-row"><span class="label">Price/Person</span><span class="value">₹{{ booking.price_per_person|floatformat:0 }}</span></div>
+        <div class="summary-total">
+          <span class="label">Total Payable</span>
+          <span class="value">₹{{ booking.total_amount|floatformat:0 }}</span>
+        </div>
+
+        <div style="margin-top:1.5rem;padding:1rem;background:rgba(255,255,255,.06);border-radius:var(--radius);font-size:.8rem;color:rgba(255,255,255,.65)">
+          <div style="font-weight:700;color:rgba(255,255,255,.85);margin-bottom:.5rem">🛡️ Safe & Secure</div>
+          ✓ 256-bit SSL Encryption<br>
+          ✓ PCI DSS Compliant<br>
+          ✓ No card details stored
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function selectMethod(method, card) {
+  document.querySelectorAll('.payment-method-card').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.payment-fields').forEach(f => f.classList.remove('active'));
+  card.classList.add('selected');
+  card.querySelector('input[type=radio]').checked = true;
+  const fields = document.getElementById('fields-' + method);
+  if (fields) fields.classList.add('active');
+}
+
+// Mock Payment Processing Simulation
+document.getElementById('payment-form').addEventListener('submit', function(e) {
+  // Only intercept if the form is actually valid to prevent bypassing HTML5 validation
+  if (!this.checkValidity()) return;
+  
+  e.preventDefault();
+  const btn = document.getElementById('pay-btn');
+  const btnText = document.getElementById('btn-text');
+  const originalHtml = btnText.innerHTML;
+  
+  btn.style.opacity = '0.9';
+  btn.style.pointerEvents = 'none';
+  
+  // Step 1: Connecting
+  btnText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Contacting Secure Server...';
+  
+  setTimeout(() => {
+    // Step 2: Processing
+    btnText.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Verifying Payment Details...';
+    
+    setTimeout(() => {
+      // Step 3: Success & Submit
+      btnText.innerHTML = '<i class="fas fa-check-circle"></i> Payment Successful!';
+      btn.style.backgroundColor = '#10B981';
+      btn.style.borderColor = '#10B981';
+      
+      setTimeout(() => {
+        this.submit();
+      }, 800);
+      
+    }, 1500);
+  }, 1000);
+});
+</script>
+{% endblock %}

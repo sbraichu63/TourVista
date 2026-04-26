@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Register — TourVista India{% endblock %}
+{% block navbar_class %}solid{% endblock %}
+
+{% block content %}
+<div class="auth-page" style="padding-top:var(--navbar-height)">
+
+  <!-- LEFT PANEL -->
+  <div class="auth-left">
+    <a href="{% url 'core:home' %}" style="display:inline-flex;align-items:center;gap:.5rem;color:rgba(255,255,255,.7);font-size:.85rem;margin-bottom:2rem">
+      <i class="fas fa-arrow-left"></i> Back to Home
+    </a>
+    <h1>Start Your India Adventure</h1>
+    <p>Create your free TourVista account and unlock access to India's most curated tour packages, live weather updates, AI travel assistant, and exclusive deals.</p>
+    <div class="auth-features">
+      <div class="auth-feature">
+        <div class="auth-feature-icon"><i class="fas fa-shield-alt"></i></div>
+        <span>Secure, encrypted booking with instant confirmation</span>
+      </div>
+      <div class="auth-feature">
+        <div class="auth-feature-icon"><i class="fas fa-robot"></i></div>
+        <span>AI-powered travel assistant for personalized recommendations</span>
+      </div>
+      <div class="auth-feature">
+        <div class="auth-feature-icon"><i class="fas fa-history"></i></div>
+        <span>Full booking history, receipts & cancellation from dashboard</span>
+      </div>
+      <div class="auth-feature">
+        <div class="auth-feature-icon"><i class="fas fa-heart"></i></div>
+        <span>Save your dream destinations to wishlist</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="auth-right">
+    <div class="auth-box">
+      <h2>Create Your Account</h2>
+      <p class="subtitle">Join 5,000+ travellers exploring Incredible India 🇮🇳</p>
+
+      <form method="post" id="register-form" novalidate>
+        {% csrf_token %}
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+          <div class="form-group">
+            <label class="form-label" for="id_first_name">First Name <span class="required">*</span></label>
+            <div class="input-icon">
+              <i class="fas fa-user"></i>
+              <input type="text" name="first_name" id="id_first_name" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" placeholder="Rahul" value="{{ form.first_name.value|default:'' }}" required minlength="2">
+            </div>
+            {% if form.first_name.errors %}<div class="form-error"><i class="fas fa-exclamation-circle"></i>{{ form.first_name.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="id_last_name">Last Name <span class="required">*</span></label>
+            <div class="input-icon">
+              <i class="fas fa-user"></i>
+              <input type="text" name="last_name" id="id_last_name" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" placeholder="Sharma" value="{{ form.last_name.value|default:'' }}" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="id_username">Username <span class="required">*</span></label>
+          <div class="input-icon">
+            <i class="fas fa-at"></i>
+            <input type="text" name="username" id="id_username" class="form-control {% if form.username.errors %}is-invalid{% endif %}" placeholder="rahulsharma" value="{{ form.username.value|default:'' }}" required minlength="3">
+          </div>
+          {% if form.username.errors %}<div class="form-error"><i class="fas fa-exclamation-circle"></i>{{ form.username.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="id_email">Email Address <span class="required">*</span></label>
+          <div class="input-icon">
+            <i class="fas fa-envelope"></i>
+            <input type="email" name="email" id="id_email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" placeholder="rahul@example.com" value="{{ form.email.value|default:'' }}" required>
+          </div>
+          {% if form.email.errors %}<div class="form-error"><i class="fas fa-exclamation-circle"></i>{{ form.email.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="id_phone">Phone Number</label>
+          <div class="input-icon">
+            <i class="fas fa-phone"></i>
+            <input type="tel" name="phone" id="id_phone" class="form-control" placeholder="+91 98765 43210" value="{{ form.phone.value|default:'' }}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="id_password1">Password <span class="required">*</span></label>
+          <div class="input-icon">
+            <i class="fas fa-lock"></i>
+            <input type="password" name="password1" id="id_password1" class="form-control {% if form.password1.errors %}is-invalid{% endif %}" placeholder="Create a strong password" required>
+            <i class="fas fa-eye eye-toggle" onclick="togglePwd('id_password1',this)"></i>
+          </div>
+          <div class="password-strength">
+            <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+            <div class="strength-label" id="strength-label">Enter password</div>
+          </div>
+          {% if form.password1.errors %}<div class="form-error"><i class="fas fa-exclamation-circle"></i>{{ form.password1.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="id_password2">Confirm Password <span class="required">*</span></label>
+          <div class="input-icon">
+            <i class="fas fa-lock"></i>
+            <input type="password" name="password2" id="id_password2" class="form-control {% if form.password2.errors %}is-invalid{% endif %}" placeholder="Repeat password" required>
+            <i class="fas fa-eye eye-toggle" onclick="togglePwd('id_password2',this)"></i>
+          </div>
+          {% if form.password2.errors %}<div class="form-error"><i class="fas fa-exclamation-circle"></i>{{ form.password2.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+          <label style="display:flex;align-items:flex-start;gap:.6rem;cursor:pointer">
+            <input type="checkbox" name="agree_terms" id="id_agree_terms" style="width:16px;height:16px;margin-top:2px;accent-color:var(--saffron)" required>
+            <span style="font-size:.84rem;color:var(--gray-600)">
+              I agree to the <a href="#" style="color:var(--saffron)">Terms of Service</a> and <a href="#" style="color:var(--saffron)">Privacy Policy</a>
+            </span>
+          </label>
+          {% if form.agree_terms.errors %}<div class="form-error"><i class="fas fa-exclamation-circle"></i>{{ form.agree_terms.errors.0 }}</div>{% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100" style="justify-content:center;font-size:.95rem;padding:.85rem">
+          <i class="fas fa-user-plus"></i> Create Account
+        </button>
+      </form>
+
+      <div class="auth-switch">
+        Already have an account? <a href="{% url 'accounts:login' %}">Login here</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePwd(id, icon) {
+  const input = document.getElementById(id);
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.className = 'fas fa-eye-slash eye-toggle';
+  } else {
+    input.type = 'password';
+    icon.className = 'fas fa-eye eye-toggle';
+  }
+}
+</script>
+{% endblock %}

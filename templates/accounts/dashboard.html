@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}My Dashboard — TourVista India{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:calc(var(--navbar-height) + 2rem);padding-bottom:3rem">
+
+  <!-- Verify Email Banner -->
+  {% if not profile.email_verified %}
+  <div style="background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:1px solid #F59E0B;border-radius:var(--radius);padding:1rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem">
+    <div style="display:flex;align-items:center;gap:.75rem">
+      <i class="fas fa-envelope" style="color:#D97706;font-size:1.1rem"></i>
+      <span style="color:#92400E;font-size:.9rem;font-weight:500">
+        📧 Please verify your email <strong>{{ request.user.email }}</strong> to unlock all booking features.
+      </span>
+    </div>
+    <a href="{% url 'accounts:resend_verification' %}" class="btn btn-sm" style="background:#D97706;color:white;border-radius:999px">Resend Email</a>
+  </div>
+  {% endif %}
+
+  <div class="dashboard-layout" style="padding-top:0">
+
+    <!-- ── SIDEBAR ─────────────────────────────────────────── -->
+    <aside class="dashboard-sidebar">
+      <div class="dash-avatar">
+        {% if profile.profile_pic %}
+          <img src="{{ profile.profile_pic.url }}" alt="Avatar">
+        {% else %}
+          {{ request.user.first_name.0|default:request.user.username.0|upper }}
+        {% endif %}
+      </div>
+      <div class="dash-user-name">{{ profile.full_name }}</div>
+      <div class="dash-user-email">{{ request.user.email }}</div>
+      <div style="text-align:center;margin-bottom:.25rem">
+        <span class="dash-verify-badge {% if profile.email_verified %}verified{% else %}unverified{% endif %}">
+          <i class="fas {% if profile.email_verified %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+          {% if profile.email_verified %}Email Verified{% else %}Unverified{% endif %}
+        </span>
+      </div>
+      <div style="text-align:center;font-size:.75rem;color:var(--gray-400);margin-bottom:.25rem">Member since {{ request.user.date_joined|date:"M Y" }}</div>
+      <nav class="dash-nav">
+        <a href="#bookings" class="active"><i class="fas fa-suitcase-rolling"></i> My Bookings</a>
+        <a href="#wishlist"><i class="fas fa-heart"></i> Wishlist</a>
+        <a href="#reviews"><i class="fas fa-star"></i> My Reviews</a>
+        <a href="{% url 'accounts:profile_update' %}"><i class="fas fa-user-edit"></i> Edit Profile</a>
+        <a href="#" style="color:var(--danger)" onclick="document.getElementById('logout-frm').submit()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </nav>
+    </aside>
+
+    <!-- ── MAIN CONTENT ──────────────────────────────────── -->
+    <div>
+
+      <!-- Stats -->
+      <div class="dash-stat-grid">
+        <div class="dash-stat">
+          <div class="stat-icon" style="background:rgba(255,107,53,.1)"><i class="fas fa-ticket-alt" style="color:var(--saffron)"></i></div>
+          <div class="stat-num">{{ total_bookings }}</div>
+          <div class="stat-label">Total Bookings</div>
+        </div>
+        <div class="dash-stat">
+          <div class="stat-icon" style="background:rgba(16,185,129,.1)"><i class="fas fa-check-circle" style="color:var(--success)"></i></div>
+          <div class="stat-num">{{ confirmed }}</div>
+          <div class="stat-label">Confirmed</div>
+        </div>
+        <div class="dash-stat">
+          <div class="stat-icon" style="background:rgba(245,158,11,.1)"><i class="fas fa-clock" style="color:var(--warning)"></i></div>
+          <div class="stat-num">{{ pending }}</div>
+          <div class="stat-label">Pending</div>
+        </div>
+        <div class="dash-stat">
+          <div class="stat-icon" style="background:rgba(59,130,246,.1)"><i class="fas fa-flag-checkered" style="color:var(--info)"></i></div>
+          <div class="stat-num">{{ completed }}</div>
+          <div class="stat-label">Completed</div>
+        </div>
+      </div>
+
+      <!-- ── BOOKINGS ──────────────────────────────────── -->
+      <div class="dash-section" id="bookings">
+        <h3><i class="fas fa-suitcase-rolling" style="color:var(--saffron)"></i> My Bookings</h3>
+
+        {% if bookings %}
+        <!-- Filter pills -->
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem" id="booking-filters">
+          <button class="btn btn-sm btn-primary" onclick="filterBookings('all',this)">All</button>
+          <button class="btn btn-sm btn-outline" onclick="filterBookings('confirmed',this)">Confirmed</button>
+          <button class="btn btn-sm btn-outline" onclick="filterBookings('pending',this)">Pending</button>
+          <button class="btn btn-sm btn-outline" onclick="filterBookings('cancelled',this)">Cancelled</button>
+          <button class="btn btn-sm btn-outline" onclick="filterBookings('completed',this)">Completed</button>
+        </div>
+
+        <div style="overflow-x:auto">
+          <table class="booking-table" id="bookings-table">
+            <thead>
+              <tr>
+                <th>Ref</th>
+                <th>Package</th>
+                <th>Travel Date</th>
+                <th>Travellers</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for booking in bookings %}
+              <tr data-status="{{ booking.status }}">
+                <td style="font-weight:700;color:var(--saffron);font-size:.85rem">#{{ booking.booking_ref }}</td>
+                <td>
+                  <a href="{{ booking.package.get_absolute_url }}" style="font-weight:600;color:var(--navy);font-size:.88rem">{{ booking.package.title|truncatechars:30 }}</a>
+                  <div style="font-size:.75rem;color:var(--gray-500)">{{ booking.package.get_state_display }}</div>
+                </td>
+                <td style="font-size:.88rem">{{ booking.travel_date|date:"d M Y" }}</td>
+                <td style="font-size:.88rem;text-align:center">{{ booking.num_travellers }}</td>
+                <td style="font-weight:700;color:var(--navy);font-size:.88rem">₹{{ booking.total_amount|floatformat:0 }}</td>
+                <td><span class="status-badge {{ booking.status }}">{{ booking.get_status_display }}</span></td>
+                <td>
+                  <div style="display:flex;gap:.4rem">
+                    {% if booking.status == 'confirmed' %}
+                    <a href="{% url 'bookings:receipt' booking.booking_ref %}" class="btn btn-sm btn-teal" title="View Receipt"><i class="fas fa-receipt"></i></a>
+                    <a href="{% url 'bookings:download_receipt' booking.booking_ref %}" class="btn btn-sm" style="background:var(--gray-100);color:var(--gray-700)" title="Download PDF"><i class="fas fa-download"></i></a>
+                    {% elif booking.status == 'pending' %}
+                    <a href="{% url 'bookings:payment' booking.booking_ref %}" class="btn btn-sm btn-primary" title="Complete Payment"><i class="fas fa-credit-card"></i> Pay</a>
+                    {% endif %}
+                    {% if booking.status in 'pending,confirmed' %}
+                    <a href="{% url 'bookings:cancel' booking.booking_ref %}" class="btn btn-sm" style="background:rgba(239,68,68,.08);color:var(--danger)" title="Cancel"><i class="fas fa-times"></i></a>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">✈️</div>
+          <h3>No bookings yet</h3>
+          <p>Start exploring India! Browse our curated packages.</p>
+          <a href="{% url 'core:packages' %}" class="btn btn-primary mt-3">Browse Packages</a>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- ── WISHLIST ─────────────────────────────────── -->
+      <div class="dash-section" id="wishlist">
+        <h3><i class="fas fa-heart" style="color:#EF4444"></i> My Wishlist</h3>
+        {% if wishlist %}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem">
+          {% for item in wishlist %}
+          <div style="background:var(--gray-50);border-radius:var(--radius);overflow:hidden;border:1px solid var(--gray-200)">
+            <div style="height:130px;background:linear-gradient(135deg,var(--navy),var(--teal));display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative">
+              {% if item.package.main_image %}
+                <img src="{{ item.package.main_image.url }}" style="width:100%;height:100%;object-fit:cover">
+              {% else %}🌏{% endif %}
+            </div>
+            <div style="padding:.9rem">
+              <div style="font-size:.75rem;color:var(--teal);font-weight:600;margin-bottom:.2rem">{{ item.package.get_state_display }}</div>
+              <div style="font-weight:700;color:var(--navy);font-size:.9rem;margin-bottom:.5rem">{{ item.package.title|truncatechars:34 }}</div>
+              <div style="font-size:.82rem;color:var(--gray-500);margin-bottom:.75rem">{{ item.package.duration_days }}D · ₹{{ item.package.discounted_price|floatformat:0 }}/person</div>
+              <div style="display:flex;gap:.5rem">
+                <a href="{{ item.package.get_absolute_url }}" class="btn btn-primary btn-sm" style="flex:1;justify-content:center">View</a>
+                <button class="btn btn-sm" style="background:rgba(239,68,68,.08);color:var(--danger)" data-wishlist="{{ item.package.pk }}" title="Remove"><i class="fas fa-heart-broken"></i></button>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">💔</div>
+          <h3>Your wishlist is empty</h3>
+          <p>Tap the heart icon on any package to save it here.</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- ── REVIEWS ──────────────────────────────────── -->
+      <div class="dash-section" id="reviews">
+        <h3><i class="fas fa-star" style="color:#F59E0B"></i> My Reviews</h3>
+        {% if reviews %}
+          {% for review in reviews %}
+          <div style="padding:.9rem 0;border-bottom:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <a href="{{ review.package.get_absolute_url }}" style="font-weight:700;color:var(--navy);font-size:.9rem">{{ review.package.title }}</a>
+              <div class="stars" style="margin:.2rem 0;font-size:.8rem">
+                {% for i in "12345" %}{% if forloop.counter <= review.rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+              </div>
+              <p style="font-size:.85rem;color:var(--gray-600);margin-top:.3rem">{{ review.comment|truncatechars:80 }}</p>
+            </div>
+            <span style="font-size:.75rem;color:var(--gray-400);white-space:nowrap;margin-left:1rem">{{ review.created_at|date:"d M Y" }}</span>
+          </div>
+          {% endfor %}
+        {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">⭐</div>
+          <h3>No reviews yet</h3>
+          <p>After travelling, share your experience to help others.</p>
+        </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterBookings(status, btn) {
+  document.querySelectorAll('#booking-filters button').forEach(b => {
+    b.className = 'btn btn-sm btn-outline';
+  });
+  btn.className = 'btn btn-sm btn-primary';
+  document.querySelectorAll('#bookings-table tbody tr').forEach(row => {
+    row.style.display = (status === 'all' || row.dataset.status === status) ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}

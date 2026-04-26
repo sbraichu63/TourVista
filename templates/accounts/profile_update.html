@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Update Profile — TourVista India{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top:calc(var(--navbar-height) + 2rem);padding-bottom:4rem">
+  <div style="max-width:800px;margin:0 auto">
+    
+    <div style="margin-bottom:2rem">
+      <a href="{% url 'accounts:dashboard' %}" style="display:inline-flex;align-items:center;gap:.5rem;color:var(--gray-500);font-size:.9rem">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+      </a>
+      <h1 style="color:var(--navy);margin-top:1rem">Edit Your Profile</h1>
+    </div>
+
+    <div style="background:white;border-radius:var(--radius-lg);padding:2.5rem;box-shadow:var(--shadow-md);border:1px solid var(--gray-100)">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input type="text" name="first_name" class="form-control" value="{{ form.initial.first_name }}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input type="text" name="last_name" class="form-control" value="{{ form.initial.last_name }}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" name="email" class="form-control" value="{{ form.initial.email }}">
+          <div class="form-hint">Changing email will require re-verification.</div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid var(--gray-100);margin:2rem 0">
+
+        <!-- Using crispy for the profile model fields -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+          {{ form.phone|as_crispy_field }}
+          {{ form.city|as_crispy_field }}
+        </div>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+            {{ form.state|as_crispy_field }}
+            {{ form.date_of_birth|as_crispy_field }}
+        </div>
+
+        <div class="form-group">
+            {{ form.profile_pic|as_crispy_field }}
+        </div>
+
+        <div class="form-group">
+            {{ form.bio|as_crispy_field }}
+        </div>
+
+        <div style="display:flex;gap:1rem;margin-top:2rem">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+          <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline">Cancel</a>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

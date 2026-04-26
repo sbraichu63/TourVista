@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tour Packages — India{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div class="container">
+    <h1>Explore India Tour Packages</h1>
+    <p>{{ total_count }} curated packages across Incredible India{% if selected_state %} · {{ selected_state|title }}{% endif %}</p>
+    <div style="display:flex;align-items:center;gap:.75rem;justify-content:center;margin-top:1.25rem;flex-wrap:wrap">
+      <form method="get" action="" style="display:flex;gap:.5rem;background:rgba(255,255,255,.12);backdrop-filter:blur(8px);border-radius:999px;padding:.4rem .75rem">
+        <input type="text" name="q" value="{{ search }}" placeholder="Search packages..." style="border:none;background:transparent;color:white;outline:none;font-size:.9rem;width:220px" class="search-input-pkg">
+        <button type="submit" style="background:none;border:none;color:white;cursor:pointer"><i class="fas fa-search"></i></button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="section section-sm" style="background:var(--gray-50)">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:270px 1fr;gap:2rem;align-items:start">
+
+      <!-- ── FILTER SIDEBAR ──────────────────────────────── -->
+      <aside class="filter-sidebar">
+        <form method="get" action="" id="filter-form">
+          {% if search %}<input type="hidden" name="q" value="{{ search }}">{% endif %}
+          <h3>
+            <span><i class="fas fa-sliders-h" style="color:var(--saffron)"></i> Filters</span>
+            <a href="{% url 'core:packages' %}" style="font-size:.78rem;font-weight:500;color:var(--saffron)">Clear All</a>
+          </h3>
+
+          <!-- State -->
+          <div class="filter-section">
+            <h4>Destination State</h4>
+            <label class="filter-check">
+              <input type="radio" name="state" value="" {% if not selected_state %}checked{% endif %} onchange="this.form.submit()">
+              All States
+            </label>
+            {% for val, label in states %}
+            <label class="filter-check">
+              <input type="radio" name="state" value="{{ val }}" {% if selected_state == val %}checked{% endif %} onchange="this.form.submit()">
+              {{ label }}
+            </label>
+            {% endfor %}
+          </div>
+
+          <!-- Season -->
+          <div class="filter-section">
+            <h4>Best Season</h4>
+            <label class="filter-check">
+              <input type="radio" name="season" value="" {% if not selected_season %}checked{% endif %} onchange="this.form.submit()"> All Seasons
+            </label>
+            {% for val, label in seasons %}
+            <label class="filter-check">
+              <input type="radio" name="season" value="{{ val }}" {% if selected_season == val %}checked{% endif %} onchange="this.form.submit()"> {{ label }}
+            </label>
+            {% endfor %}
+          </div>
+
+          <!-- Duration -->
+          <div class="filter-section">
+            <h4>Duration</h4>
+            <label class="filter-check"><input type="radio" name="duration" value="" {% if not selected_duration %}checked{% endif %} onchange="this.form.submit()"> Any Duration</label>
+            <label class="filter-check"><input type="radio" name="duration" value="1-3" {% if selected_duration == '1-3' %}checked{% endif %} onchange="this.form.submit()"> 1–3 Days</label>
+            <label class="filter-check"><input type="radio" name="duration" value="4-7" {% if selected_duration == '4-7' %}checked{% endif %} onchange="this.form.submit()"> 4–7 Days</label>
+            <label class="filter-check"><input type="radio" name="duration" value="8+" {% if selected_duration == '8+' %}checked{% endif %} onchange="this.form.submit()"> 8+ Days</label>
+          </div>
+
+          <!-- Difficulty -->
+          <div class="filter-section">
+            <h4>Difficulty</h4>
+            <label class="filter-check"><input type="radio" name="difficulty" value="" {% if not selected_difficulty %}checked{% endif %} onchange="this.form.submit()"> All Levels</label>
+            {% for val, label in difficulties %}
+            <label class="filter-check"><input type="radio" name="difficulty" value="{{ val }}" {% if selected_difficulty == val %}checked{% endif %} onchange="this.form.submit()"> {{ label }}</label>
+            {% endfor %}
+          </div>
+        </form>
+      </aside>
+
+      <!-- ── PACKAGE GRID ────────────────────────────────── -->
+      <div>
+        <div class="sort-bar">
+          <span style="font-size:.9rem;color:var(--gray-600)">
+            <strong style="color:var(--navy)">{{ total_count }}</strong> packages found
+          </span>
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <span style="font-size:.85rem;color:var(--gray-500)">Sort by:</span>
+            <select onchange="sortPackages(this.value)" style="border:1px solid var(--gray-200);border-radius:8px;padding:.4rem .8rem;font-size:.88rem;color:var(--gray-700);background:var(--white);outline:none">
+              <option value="featured" {% if sort == 'featured' %}selected{% endif %}>Featured</option>
+              <option value="deals" {% if sort == 'deals' %}selected{% endif %}>Best Deals</option>
+              <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+              <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+              <option value="duration" {% if sort == 'duration' %}selected{% endif %}>Duration</option>
+              <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+            </select>
+          </div>
+        </div>
+
+        {% if packages %}
+        <div class="packages-grid">
+          {% for package in packages %}
+          <div class="package-card">
+            <div class="package-card-img">
+              {% if package.main_image %}
+                <img src="{{ package.main_image.url }}" alt="{{ package.title }}" loading="lazy">
+              {% else %}
+                <div class="img-placeholder">
+                  {% cycle '🏰' '🏖️' '🌴' '🏔️' '❄️' '🌿' '🕌' '🐘' '🦚' '🌺' %}
+                </div>
+              {% endif %}
+              {% if package.discount_percent > 0 %}
+                <span class="card-badge">{{ package.discount_percent }}% OFF</span>
+              {% elif package.is_featured %}
+                <span class="card-badge">⭐ Featured</span>
+              {% endif %}
+              {% if user.is_authenticated %}
+              <button class="card-wishlist {% if package.pk in wishlist_ids %}active{% endif %}"
+                data-wishlist="{{ package.pk }}" title="Wishlist">
+                <i class="{% if package.pk in wishlist_ids %}fas{% else %}far{% endif %} fa-heart"></i>
+              </button>
+              {% endif %}
+            </div>
+            <div class="package-card-body">
+              <div class="card-state"><i class="fas fa-map-pin"></i> {{ package.get_state_display }}</div>
+              <h3 class="card-title">{{ package.title }}</h3>
+              <div class="card-meta">
+                <span><i class="fas fa-moon"></i> {{ package.nights }}N/{{ package.duration_days }}D</span>
+                <span><i class="fas fa-users"></i> Max {{ package.max_group_size }}</span>
+                <span><i class="fas fa-mountain"></i> {{ package.get_difficulty_display }}</span>
+              </div>
+              {% if package.avg_rating > 0 %}
+              <div class="card-rating">
+                <div class="stars">
+                  {% for i in "12345" %}{% if forloop.counter <= package.avg_rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+                </div>
+                <span style="font-weight:600;font-size:.85rem">{{ package.avg_rating }}</span>
+                <small>({{ package.review_count }})</small>
+              </div>
+              {% endif %}
+              <p style="font-size:.83rem;color:var(--gray-500);margin-bottom:.9rem;display:-webkit-box;line-clamp:2;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ package.description|truncatewords:18 }}</p>
+              <div class="card-footer">
+                <div class="card-price">
+                  {% if package.discount_percent > 0 %}
+                    <div class="original">₹{{ package.price_per_person|floatformat:0 }}</div>
+                  {% endif %}
+                  <div class="final">₹{{ package.discounted_price|floatformat:0 }}</div>
+                  <div class="per">per person</div>
+                </div>
+                <a href="{{ package.get_absolute_url }}" class="btn btn-primary btn-sm">View Details</a>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="empty-state" style="background:white;border-radius:var(--radius-lg);padding:4rem">
+          <div class="empty-icon">🔍</div>
+          <h3>No packages found</h3>
+          <p>Try adjusting your filters or <a href="{% url 'core:packages' %}" style="color:var(--saffron)">reset all filters</a>.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function sortPackages(val) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('sort', val);
+  window.location.href = url.toString();
+}
+</script>
+{% endblock %}

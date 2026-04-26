@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Email Verified — TourVista India{% endblock %}
+{% block content %}
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ivory);padding-top:var(--navbar-height)">
+  <div style="background:white;border-radius:var(--radius-xl);padding:3rem;text-align:center;max-width:480px;box-shadow:var(--shadow-lg)">
+    <div style="width:80px;height:80px;background:rgba(16,185,129,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:2.5rem">✅</div>
+    <h2 style="color:var(--navy);margin-bottom:.75rem">Email Verified!</h2>
+    <p style="color:var(--gray-600);margin-bottom:2rem">
+      Welcome, <strong>{{ user.first_name|default:user.username }}</strong>! 🎉<br>
+      Your email has been verified successfully. You can now book tour packages and access all TourVista features.
+    </p>
+    <a href="{% url 'core:packages' %}" class="btn btn-primary btn-lg" style="justify-content:center">
+      <i class="fas fa-suitcase-rolling"></i> Start Exploring India!
+    </a>
+    <div style="margin-top:1rem">
+      <a href="{% url 'accounts:dashboard' %}" style="color:var(--gray-500);font-size:.875rem">Go to Dashboard →</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}About TourVista India — Our Story{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+  <div class="container">
+    <div class="badge-tag" style="background:rgba(255,255,255,.1);color:white;border-color:rgba(255,255,255,.2)">Since 2024</div>
+    <h1>Namaste! We are TourVista.</h1>
+    <p>We are a team of travel enthusiasts dedicated to showing you the true soul of Incredible India 🇮🇳</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center">
+      <div>
+        <h2 style="color:var(--navy);margin-bottom:1.5rem">Our Mission</h2>
+        <p style="font-size:1.1rem;color:var(--gray-600);line-height:1.7;margin-bottom:1.5rem">
+          India is not just a destination; it's an experience that stays with you forever. Our mission is to make this experience seamless, authentic, and accessible to everyone.
+        </p>
+        <p style="color:var(--gray-500);line-height:1.6">
+          Whether it's the golden sands of Rajasthan, the tranquil backwaters of Kerala, or the snow-capped peaks of the Himalayas, we curate every tour with love and precision. We believe in sustainable tourism that respects local cultures and empowers communities.
+        </p>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:2rem">
+          <div style="background:var(--gray-50);padding:1.5rem;border-radius:var(--radius)">
+            <div style="font-size:2rem;font-weight:800;color:var(--saffron)">100+</div>
+            <div style="font-size:.85rem;color:var(--gray-500);font-weight:600">Curated Tours</div>
+          </div>
+          <div style="background:var(--gray-50);padding:1.5rem;border-radius:var(--radius)">
+            <div style="font-size:2rem;font-weight:800;color:var(--teal)">50k+</div>
+            <div style="font-size:.85rem;color:var(--gray-500);font-weight:600">Happy Travellers</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="position:relative">
+          <div style="width:100%;height:450px;border-radius:var(--radius-xl);background:linear-gradient(45deg,var(--navy),var(--teal));display:flex;align-items:center;justify-content:center;font-size:10rem">🛶</div>
+          <div style="position:absolute;bottom:-20px;right:-20px;background:var(--white);padding:1.5rem;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:200px">
+            <div style="font-size:1.5rem;font-weight:800;color:var(--navy)">#1</div>
+            <div style="font-size:.8rem;color:var(--gray-500)">Award winning travel agency in 2025</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--navy);color:white">
+  <div class="container">
+    <div class="section-header" style="text-align:center">
+      <h2 style="color:white">Why Choose TourVista?</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2rem">
+      <div style="text-align:center;padding:2rem;background:rgba(255,255,255,.05);border-radius:var(--radius-lg)">
+        <div style="font-size:3rem;margin-bottom:1rem">💎</div>
+        <h3 style="color:white;margin-bottom:1rem">Best Price Guarantee</h3>
+        <p style="color:rgba(255,255,255,.6);font-size:.9rem">We work directly with local vendors to ensure you get the best value for your money without compromising on quality.</p>
+      </div>
+      <div style="text-align:center;padding:2rem;background:rgba(255,255,255,.05);border-radius:var(--radius-lg)">
+        <div style="font-size:3rem;margin-bottom:1rem">🤝</div>
+        <h3 style="color:white;margin-bottom:1rem">Verified Experts</h3>
+        <p style="color:rgba(255,255,255,.6);font-size:.9rem">Our tour guides are locals who know the hidden gems and history that typical tourists never get to see.</p>
+      </div>
+      <div style="text-align:center;padding:2rem;background:rgba(255,255,255,.05);border-radius:var(--radius-lg)">
+        <div style="font-size:3rem;margin-bottom:1rem">🛡️</div>
+        <h3 style="color:white;margin-bottom:1rem">24/7 Support</h3>
+        <p style="color:rgba(255,255,255,.6);font-size:.9rem">From the moment you land until you depart, our dedicated support team is just a call away for anything you need.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

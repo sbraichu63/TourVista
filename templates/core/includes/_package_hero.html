@@ -1,0 +1,76 @@
+<!-- ── DETAIL HERO ───────────────────────────────────────────── -->
+<div class="detail-hero">
+  {% if package.main_image %}
+  <img id="main-gallery-img" src="{{ package.main_image.url }}" alt="{{ package.title }}">
+  {% else %}
+  <div
+    style="width:100%;height:100%;background:linear-gradient(135deg,var(--navy),var(--teal-dark));display:flex;align-items:center;justify-content:center;font-size:8rem">
+    {% cycle '🏖️' '🏔️' '🌴' '🏰' '❄️' %}
+  </div>
+  {% endif %}
+  <div class="detail-hero-overlay"></div>
+  <div class="detail-hero-info">
+    <div class="container">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+        <div>
+          <div style="margin-bottom:.5rem">
+            <span
+              style="background:var(--saffron);color:white;padding:.2rem .7rem;border-radius:999px;font-size:.75rem;font-weight:700">{{ package.get_state_display }}</span>
+            {% if package.is_featured %}<span
+              style="background:rgba(255,255,255,.15);color:white;padding:.2rem .7rem;border-radius:999px;font-size:.75rem;margin-left:.5rem">⭐
+              Featured</span>{% endif %}
+          </div>
+          <h1>{{ package.title }}</h1>
+          <div class="detail-hero-meta">
+            <span><i class="fas fa-moon"></i> {{ package.nights }} Nights / {{ package.duration_days }} Days</span>
+            <span><i class="fas fa-users"></i> Max {{ package.max_group_size }} people</span>
+            <span><i class="fas fa-mountain"></i> {{ package.get_difficulty_display }}</span>
+            <span><i class="fas fa-sun"></i> {{ package.get_best_season_display }}</span>
+            {% if package.avg_rating > 0 %}
+            <span><i class="fas fa-star" style="color:#F59E0B"></i> {{ package.avg_rating }} ({{ package.review_count }}
+              reviews)</span>
+            {% endif %}
+          </div>
+        </div>
+        <div style="display:flex;gap:.75rem">
+          {% if user.is_authenticated %}
+          <button class="btn btn-outline {% if in_wishlist %}active{% endif %}" style="border-color:white;color:white"
+            data-wishlist="{{ package.pk }}" id="wishlist-btn">
+            <i class="{% if in_wishlist %}fas{% else %}far{% endif %} fa-heart"></i>
+            {% if in_wishlist %}Saved{% else %}Save{% endif %}
+          </button>
+          {% endif %}
+          <a href="{% url 'bookings:book' package.slug %}" class="btn btn-primary">
+            <i class="fas fa-calendar-check"></i> Book Now
+          </a>
+        </div>
+      </div>
+
+      <!-- Thumbnail Gallery -->
+      {% if package.image_2 or package.image_3 or package.image_4 %}
+      <div class="gallery-thumbs" style="margin-top:.75rem">
+        {% if package.main_image %}
+        <div class="gallery-thumb active" data-src="{{ package.main_image.url }}">
+          <img src="{{ package.main_image.url }}" alt="Img 1">
+        </div>
+        {% endif %}
+        {% if package.image_2 %}
+        <div class="gallery-thumb" data-src="{{ package.image_2.url }}">
+          <img src="{{ package.image_2.url }}" alt="Img 2">
+        </div>
+        {% endif %}
+        {% if package.image_3 %}
+        <div class="gallery-thumb" data-src="{{ package.image_3.url }}">
+          <img src="{{ package.image_3.url }}" alt="Img 3">
+        </div>
+        {% endif %}
+        {% if package.image_4 %}
+        <div class="gallery-thumb" data-src="{{ package.image_4.url }}">
+          <img src="{{ package.image_4.url }}" alt="Img 4">
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

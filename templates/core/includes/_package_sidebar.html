@@ -1,0 +1,86 @@
+<!-- RIGHT: Booking Sidebar -->
+<div style="position:sticky;top:calc(var(--navbar-height) + 1rem)">
+  <div
+    style="background:white;border-radius:var(--radius-lg);padding:1.75rem;box-shadow:var(--shadow-md);border:1px solid var(--gray-100)">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem">
+        <div>
+          {% if package.discount_percent > 0 %}
+          <div style="text-decoration:line-through;color:var(--gray-400);font-size:0.9rem">₹{{ package.price_per_person|floatformat:0 }}</div>
+          {% endif %}
+          <div style="font-size:1.8rem;font-weight:800;color:var(--navy)">₹{{ package.discounted_price|floatformat:0 }}</div>
+          <div style="font-size:0.8rem;color:var(--gray-500)">per person</div>
+        </div>
+      {% if package.discount_percent > 0 %}
+      <span style="background:rgba(16,185,129,0.1);color:#059669;padding:0.3rem 0.7rem;border-radius:999px;font-size:0.78rem;font-weight:700">{{ package.discount_percent }}% OFF</span>
+      {% endif %}
+    </div>
+
+    <div style="border-top:1px solid var(--gray-100);padding-top:1rem;margin-bottom:1.25rem">
+      <div style="display:flex;flex-direction:column;gap:.6rem">
+        <div style="display:flex;justify-content:space-between;font-size:.88rem">
+          <span style="color:var(--gray-500)"><i class="fas fa-moon" style="width:16px;color:var(--saffron)"></i>
+            Duration</span>
+          <span style="font-weight:600;color:var(--navy)">{{ package.nights }} Nights / {{ package.duration_days }} Days</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.88rem">
+          <span style="color:var(--gray-500)"><i class="fas fa-car" style="width:16px;color:var(--saffron)"></i>
+            Transport</span>
+          <span style="font-weight:600;color:var(--navy)">{{ package.get_transportation_display }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.88rem">
+          <span style="color:var(--gray-500)"><i class="fas fa-bed" style="width:16px;color:var(--saffron)"></i>
+            Stay</span>
+          <span style="font-weight:600;color:var(--navy)">{{ package.get_accommodation_display }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.88rem">
+          <span style="color:var(--gray-500)"><i class="fas fa-users" style="width:16px;color:var(--saffron)"></i>
+            Max Group</span>
+          <span style="font-weight:600;color:var(--navy)">{{ package.max_group_size }} people</span>
+        </div>
+      </div>
+    </div>
+
+    <a href="{% url 'bookings:book' package.slug %}" class="btn btn-primary w-100"
+      style="justify-content:center;font-size:1rem;padding:.85rem">
+      <i class="fas fa-calendar-check"></i> Book This Package
+    </a>
+
+    <div style="margin-top:1rem;text-align:center;font-size:.78rem;color:var(--gray-500)">
+      <i class="fas fa-shield-alt" style="color:var(--success)"></i> Free cancellation · Secure payment
+    </div>
+
+    {% if not user.is_authenticated %}
+    <div
+      style="margin-top:1rem;background:var(--cream);border-radius:var(--radius-sm);padding:.75rem;text-align:center;font-size:.82rem;color:var(--gray-600)">
+      <a href="{% url 'accounts:login' %}" style="color:var(--saffron);font-weight:600">Login</a> to book this
+      package
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Related Packages -->
+  {% if related %}
+  <div style="margin-top:1.5rem">
+    <h3
+      style="font-size:.95rem;font-family:var(--font-body);font-weight:700;color:var(--navy);margin-bottom:.9rem">
+      🌏 Similar Packages</h3>
+    {% for pkg in related %}
+    <a href="{{ pkg.get_absolute_url }}"
+      style="display:flex;gap:.8rem;background:white;border-radius:var(--radius);padding:.85rem;margin-bottom:.6rem;box-shadow:var(--shadow-sm);transition:var(--transition);text-decoration:none"
+      class="related-pkg-card">
+      <div
+        style="width:60px;height:60px;border-radius:var(--radius-sm);overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,var(--saffron),var(--teal));display:flex;align-items:center;justify-content:center;font-size:1.5rem">
+        {% if pkg.main_image %}<img src="{{ pkg.main_image.url }}"
+          style="width:100%;height:100%;object-fit:cover">{% else %}🌏{% endif %}
+      </div>
+      <div style="flex:1;min-width:0">
+        <div
+          style="font-size:.85rem;font-weight:600;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+          {{ pkg.title }}</div>
+        <div style="font-size:.78rem;color:var(--gray-500)">{{ pkg.duration_days }}D · ₹{{ pkg.discounted_price|floatformat:0 }}/person</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>

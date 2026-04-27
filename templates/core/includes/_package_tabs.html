@@ -1,0 +1,473 @@
+<!-- LEFT: Tabs content -->
+<div>
+    <!-- Quick info pills -->
+    <div
+      style="display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1.5rem;padding:1.25rem;background:white;border-radius:var(--radius);box-shadow:var(--shadow-sm)">
+      <span
+        style="display:inline-flex;align-items:center;gap:.4rem;background:var(--gray-50);padding:.35rem .85rem;border-radius:999px;font-size:.82rem;color:var(--gray-700);font-weight:500">
+        <i class="fas fa-car" style="color:var(--saffron)"></i> {{ package.get_transportation_display }}
+      </span>
+      <span
+        style="display:inline-flex;align-items:center;gap:.4rem;background:var(--gray-50);padding:.35rem .85rem;border-radius:999px;font-size:.82rem;color:var(--gray-700);font-weight:500">
+        <i class="fas fa-bed" style="color:var(--saffron)"></i> {{ package.get_accommodation_display }}
+      </span>
+      <span
+        style="display:inline-flex;align-items:center;gap:.4rem;background:var(--gray-50);padding:.35rem .85rem;border-radius:999px;font-size:.82rem;color:var(--gray-700);font-weight:500">
+        <i class="fas fa-sun" style="color:var(--saffron)"></i> {{ package.get_best_season_display }}
+      </span>
+      <span
+        style="display:inline-flex;align-items:center;gap:.4rem;background:var(--gray-50);padding:.35rem .85rem;border-radius:999px;font-size:.82rem;color:var(--gray-700);font-weight:500">
+        <i class="fas fa-signal" style="color:var(--saffron)"></i> {{ package.get_difficulty_display }}
+      </span>
+      {% if package.city_name %}
+      <span
+        style="display:inline-flex;align-items:center;gap:.4rem;background:var(--gray-50);padding:.35rem .85rem;border-radius:999px;font-size:.82rem;color:var(--gray-700);font-weight:500">
+        <i class="fas fa-map-marker-alt" style="color:var(--saffron)"></i> {{ package.city_name }}
+      </span>
+      {% endif %}
+    </div>
+
+    <!-- Hotel & Transport Details Card -->
+    {% if package.hotel_name or package.transport_details %}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem">
+      {% if package.hotel_name %}
+      <div
+        style="background:white;border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow-sm);border-left:4px solid var(--saffron);display:flex;align-items:flex-start;gap:1rem">
+        <div
+          style="width:44px;height:44px;background:linear-gradient(135deg,#FF8C00,#FF6B35);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">
+          🏨</div>
+        <div>
+          <div
+            style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-400);margin-bottom:.2rem">
+            Your Hotel</div>
+          <div style="font-size:.95rem;font-weight:700;color:var(--navy)">{{ package.hotel_name }}</div>
+          {% if package.hotel_star_rating %}
+          <div style="margin-top:.3rem">
+            {% for i in "12345" %}
+            {% if forloop.counter <= package.hotel_star_rating %} <i class="fas fa-star"
+              style="color:#F59E0B;font-size:.7rem"></i>
+              {% else %}
+              <i class="far fa-star" style="color:var(--gray-300);font-size:.7rem"></i>
+              {% endif %}
+              {% endfor %}
+              <span style="font-size:.78rem;color:var(--gray-500);margin-left:.3rem">{{ package.hotel_star_rating }}-Star</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+      {% if package.transport_details %}
+      <div
+        style="background:white;border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow-sm);border-left:4px solid var(--teal);display:flex;align-items:flex-start;gap:1rem">
+        <div
+          style="width:44px;height:44px;background:linear-gradient(135deg,#0EA5E9,#0284C7);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">
+          🚗</div>
+        <div>
+          <div
+            style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-400);margin-bottom:.2rem">
+            Transport</div>
+          <div style="font-size:.9rem;font-weight:600;color:var(--navy);line-height:1.4">{{ package.transport_details }}</div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Tabs -->
+    <div class="detail-tabs">
+      <button class="tab-btn active" data-tab="tab-overview">Overview</button>
+      <button class="tab-btn" data-tab="tab-itinerary">Itinerary</button>
+      <button class="tab-btn" data-tab="tab-includes">Includes</button>
+      <button class="tab-btn" data-tab="tab-reviews">Reviews ({{ review_count }})</button>
+      <button class="tab-btn" data-tab="tab-map">Map &amp; Weather</button>
+    </div>
+
+    <!-- Overview -->
+    <div class="tab-panel active" id="tab-overview">
+      <div style="background:white;border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow-sm)">
+        <h3 style="font-size:1.1rem;margin-bottom:1rem">About This Package</h3>
+        <p style="line-height:1.8;color:var(--gray-600)">{{ package.description }}</p>
+
+        {% if package.highlights %}
+        <h3 style="font-size:1rem;margin-top:1.5rem;margin-bottom:.9rem">✨ Highlights</h3>
+        <ul style="display:flex;flex-direction:column;gap:.5rem">
+          {% for line in package.highlights_list %}
+          <li style="display:flex;align-items:flex-start;gap:.6rem;font-size:.9rem;color:var(--gray-700)">
+            <i class="fas fa-check-circle" style="color:var(--success);margin-top:2px;flex-shrink:0"></i>
+            {{ line }}
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Itinerary -->
+    <div class="tab-panel" id="tab-itinerary">
+      <div style="background:white;border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow-sm)">
+        <h3 style="font-size:1.1rem;margin-bottom:1.25rem">Day-by-Day Itinerary</h3>
+        {% if package.itinerary %}
+        {% for line in package.itinerary_list %}
+        <div class="itinerary-day">
+          <div class="day-number">{{ forloop.counter }}</div>
+          <div class="day-content">
+            <p>{{ line }}</p>
+          </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p style="color:var(--gray-500)">Detailed itinerary will be shared after booking.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Includes / Excludes -->
+    <div class="tab-panel" id="tab-includes">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="info-box">
+          <h4 style="font-size:.9rem;font-weight:700;color:var(--success);margin-bottom:.9rem"><i
+              class="fas fa-check-circle"></i> Inclusions</h4>
+          <ul>
+            {% for line in package.inclusions_list %}
+            <li><i class="fas fa-check"></i> {{ line }}</li>
+            {% empty %}
+            <li style="color:var(--gray-500)">Contact us for full details.</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="info-box exclude">
+          <h4 style="font-size:.9rem;font-weight:700;color:var(--danger);margin-bottom:.9rem"><i
+              class="fas fa-times-circle"></i> Exclusions</h4>
+          <ul>
+            {% for line in package.exclusions_list %}
+            <li><i class="fas fa-times"></i> {{ line }}</li>
+            {% empty %}
+            <li style="color:var(--gray-500)">No major exclusions.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews -->
+    <div class="tab-panel" id="tab-reviews">
+      <!-- Rating Summary -->
+      {% if reviews %}
+      <div
+        style="background:white;border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow-sm);margin-bottom:1rem">
+        <div style="display:flex;gap:2rem;align-items:center">
+          <div style="text-align:center">
+            <div style="font-size:3.5rem;font-weight:800;color:var(--navy);line-height:1">{{ avg_rating }}</div>
+            <div class="stars" style="justify-content:center;margin:.3rem 0">
+              {% for i in "12345" %}{% if forloop.counter <= avg_rating %}<i class="fas fa-star"></i>{% else %}<i
+                  class="far fa-star"></i>{% endif %}{% endfor %}
+            </div>
+            <div style="font-size:.8rem;color:var(--gray-500)">{{ review_count }} reviews</div>
+          </div>
+          <div style="flex:1">
+            {% for item in rating_dist %}
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.35rem">
+              <span style="font-size:.8rem;color:var(--gray-500);width:15px">{{ item.rating }}</span>
+              <i class="fas fa-star" style="color:#F59E0B;font-size:.75rem"></i>
+              <div style="flex:1;height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden">
+                <div style="height:100%;background:#F59E0B;width:{{ item.percent }}%;border-radius:3px"></div>
+              </div>
+              <span style="font-size:.75rem;color:var(--gray-400);width:20px;text-align:right">{{ item.count }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Review List -->
+      {% for review in reviews %}
+      <div
+        style="background:white;border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow-sm);margin-bottom:.75rem">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div style="display:flex;gap:.75rem;align-items:center">
+            <div
+              style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--saffron),var(--teal));color:white;display:flex;align-items:center;justify-content:center;font-weight:700">
+              {{ review.user.first_name.0|default:review.user.username.0|upper }}
+            </div>
+            <div>
+              <div style="font-weight:700;color:var(--navy);font-size:.9rem">{{ review.user.get_full_name|default:review.user.username }}</div>
+              <div class="stars" style="font-size:.8rem">
+                {% for i in "12345" %}{% if forloop.counter <= review.rating %}<i class="fas fa-star"></i>{% else %}<i class="far fa-star"></i>{% endif %}{% endfor %}
+              </div>
+            </div>
+          </div>
+          <span style="font-size:.78rem;color:var(--gray-400)">{{ review.created_at|date:"d M Y" }}</span>
+        </div>
+        {% if review.title %}<h4
+          style="font-size:.92rem;color:var(--navy);margin:.75rem 0 .35rem;font-family:var(--font-body)">{{ review.title }}</h4>{% endif %}
+        <p style="font-size:.88rem;color:var(--gray-600);line-height:1.6">{{ review.comment }}</p>
+      </div>
+      {% empty %}
+      <div class="empty-state" style="background:white;border-radius:var(--radius)">
+        <div class="empty-icon">⭐</div>
+        <h3>No reviews yet</h3>
+        <p>Be the first to review this package!</p>
+      </div>
+      {% endfor %}
+
+      <!-- Write Review Form -->
+      {% if user.is_authenticated and not user_review %}
+      <div
+        style="background:white;border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow-sm);margin-top:1rem">
+        <h3 style="font-size:1rem;font-family:var(--font-body);font-weight:700;margin-bottom:1.25rem">✍️ Write a
+          Review</h3>
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="form-label">Your Rating</label>
+            <div class="star-rating" style="display:flex;flex-direction:row-reverse;justify-content:flex-end">
+              {% for i in "54321" %}
+              <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" {% if forloop.last %}required{% endif %}>
+              <label for="star{{ i }}" aria-label="{{ i }} star rating"><i class="fas fa-star"
+                  style="font-size:1.6rem;color:var(--gray-300);cursor:pointer"></i></label>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Review Title (optional)</label>
+            <input type="text" name="title" class="form-control" placeholder="Summarize your experience">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Your Review <span class="required">*</span></label>
+            <textarea name="comment" class="form-control" rows="4"
+              placeholder="Share details about your experience..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit Review <i class="fas fa-paper-plane"></i></button>
+        </form>
+      </div>
+      {% elif not user.is_authenticated %}
+      <div
+        style="background:var(--cream);border-radius:var(--radius);padding:1.5rem;text-align:center;margin-top:1rem">
+        <p style="color:var(--gray-600);margin-bottom:1rem">Please log in to write a review.</p>
+        <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-primary btn-sm">Login to
+          Review</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Map & Weather -->
+    <div class="tab-panel" id="tab-map">
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:1rem">
+        <div>
+          <h3 style="font-size:1rem;font-family:var(--font-body);font-weight:700;margin-bottom:.75rem">📍 Location
+            Map</h3>
+          <div id="india-map" style="height:380px"></div>
+        </div>
+        <div>
+          <h3 style="font-size:1rem;font-family:var(--font-body);font-weight:700;margin-bottom:.75rem">🌤️ Current
+            Weather</h3>
+          <div id="weather-widget">
+            <div
+              style="background:var(--gray-100);border-radius:var(--radius);padding:2rem;text-align:center;color:var(--gray-400)">
+              <i class="fas fa-cloud-sun fa-2x" style="margin-bottom:.75rem"></i>
+              <p>Loading weather...</p>
+            </div>
+          </div>
+          <div
+            style="margin-top:1rem;background:var(--cream);border-radius:var(--radius);padding:1rem;font-size:.83rem;color:var(--gray-600)">
+            <strong>💡 Best Time to Visit:</strong> {{ package.get_best_season_display }}
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<script id="places-json" type="application/json">{{ places_json|default:'[]'|safe }}</script>
+<script>
+  {% if package.city_name %}
+    if (typeof loadWeather === 'function') {
+      loadWeather('{{ package.city_name|escapejs }}');
+    }
+  {% endif %}
+
+  // ── PLACE HOVER TOOLTIP ──────────────────────────────────────────
+  (function () {
+    const PLACES = JSON.parse(document.getElementById('places-json')?.textContent || '[]');
+    if (!Array.isArray(PLACES) || PLACES.length === 0) return;
+
+  PLACES.sort((a, b) => b.name.length - a.name.length);
+
+  const tooltip = document.createElement('div');
+  tooltip.id = 'place-tooltip';
+  tooltip.style.cssText = `
+    position:fixed;z-index:9999;max-width:360px;width:100%;pointer-events:none;
+    background:rgba(15,23,42,0.95);backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:16px;padding:0;overflow:hidden;
+    box-shadow:0 24px 70px rgba(0,0,0,0.5);
+    opacity:0;transform:translateY(8px);
+    transition:opacity 0.22s ease,transform 0.22s ease;
+    font-family:var(--font-body,sans-serif);
+  `;
+  document.body.appendChild(tooltip);
+
+  let currentTarget = null;
+
+  function escapeHtml(value) {
+    return String(value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function safeImageUrl(url) {
+    const value = String(url || '').trim();
+    if (!value) return '';
+    if (value.startsWith('/') || value.startsWith('http://') || value.startsWith('https://')) return value;
+    return '';
+  }
+
+  function showTooltip(el, place) {
+    const imageUrl = safeImageUrl(place.image_url);
+    const imgHtml = imageUrl ? `<div style="height:180px;width:100%;background:url('${encodeURI(imageUrl)}') center/cover;position:relative"><div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(transparent, rgba(15,23,42,0.95))"></div></div>` : '';
+    tooltip.innerHTML = `
+      ${imgHtml}
+      <div style="padding:18px 22px 24px 22px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span style="font-size:1.6rem;line-height:1">${escapeHtml(place.emoji || '📍')}</span>
+          <span style="font-size:1.15rem;font-weight:700;color:#F8FAFC;letter-spacing:-.01em">${escapeHtml(place.name)}</span>
+        </div>
+        <p style="margin:0;font-size:.92rem;color:rgba(203,213,225,0.95);line-height:1.6">${escapeHtml(place.specialty)}</p>
+        <div style="margin-top:12px;font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(251,146,60,0.9);display:flex;align-items:center;gap:6px">
+          <span style="width:6px;height:6px;border-radius:50%;background:#FB923C;display:inline-block"></span>
+          Hover to Explore
+        </div>
+      </div>
+    `;
+    positionTooltip(el);
+    tooltip.style.opacity = '1';
+    tooltip.style.transform = 'translateY(0)';
+  }
+
+  function positionTooltip(el) {
+    const rect = el.getBoundingClientRect();
+    const tooltipHeight = tooltip.offsetHeight || 300;
+    const tooltipWidth = 360;
+    
+    let top = rect.bottom + 10;
+    let left = rect.left;
+    
+    if (left + tooltipWidth > window.innerWidth - 16) {
+      left = window.innerWidth - tooltipWidth - 16;
+    }
+    if (left < 8) left = 8;
+    
+    if (top + tooltipHeight > window.innerHeight - 16) {
+      top = rect.top - tooltipHeight - 10;
+    }
+    
+    if (top < 8) top = 8;
+    
+    tooltip.style.top = top + 'px';
+    tooltip.style.left = left + 'px';
+  }
+
+  function hideTooltip() {
+    tooltip.style.opacity = '0';
+    tooltip.style.transform = 'translateY(8px)';
+  }
+
+  function escapeRegex(s) {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  document.querySelectorAll('.itinerary-day .day-content p').forEach(function (el) {
+    let html = el.innerHTML;
+    PLACES.forEach(function (place) {
+      if (html.includes('data-place="' + place.name + '"')) return;
+      const re = new RegExp('(?<![\\w-])(' + escapeRegex(place.name) + ')(?![\\w-])', 'gi');
+      html = html.replace(re, function (match) {
+        return `<span class="place-tag" data-place="${place.name}" tabindex="0">${match}<span class="place-tag-dot"></span></span>`;
+      });
+    });
+    el.innerHTML = html;
+  });
+
+  document.querySelectorAll('.tab-panel li').forEach(function (el) {
+    let html = el.innerHTML;
+    PLACES.forEach(function (place) {
+      if (html.includes('data-place="' + place.name + '"')) return;
+      const re = new RegExp('(?<![\\w-])(' + escapeRegex(place.name) + ')(?![\\w-])', 'gi');
+      html = html.replace(re, function (match) {
+        return `<span class="place-tag" data-place="${place.name}" tabindex="0">${match}<span class="place-tag-dot"></span></span>`;
+      });
+    });
+    el.innerHTML = html;
+  });
+
+  document.addEventListener('mouseover', function (e) {
+    const tag = e.target.closest('.place-tag');
+    if (tag && tag !== currentTarget) {
+      currentTarget = tag;
+      const name = tag.dataset.place;
+      const place = PLACES.find(p => p.name === name);
+      if (place) showTooltip(tag, place);
+    }
+  });
+  document.addEventListener('mouseout', function (e) {
+    const tag = e.target.closest('.place-tag');
+    if (tag) { currentTarget = null; hideTooltip(); }
+  });
+  document.addEventListener('scroll', hideTooltip, true);
+}) ();
+</script>
+
+<style>
+  .star-rating input {
+    display: none;
+  }
+
+  .star-rating label:hover i,
+  .star-rating label:hover ~ label i,
+  .star-rating input:checked ~ label i {
+    color: #F59E0B !important;
+  }
+
+  .place-tag {
+    position: relative;
+    display: inline;
+    cursor: pointer;
+    color: #FF6B35;
+    font-weight: 800;
+    border-bottom: 2px dashed rgba(255, 107, 53, 0.6);
+    transition: color 0.18s, border-color 0.18s;
+    padding-bottom: 1px;
+  }
+
+  .place-tag:hover {
+    color: #e07000;
+    border-color: #e07000;
+  }
+
+  .place-tag-dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    background: var(--saffron, #FF8C00);
+    border-radius: 50%;
+    vertical-align: super;
+    margin-left: 1px;
+    font-size: 0;
+    animation: pulseDot 2s infinite;
+  }
+
+  @keyframes pulseDot {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.4;
+      transform: scale(0.6);
+    }
+  }
+</style>

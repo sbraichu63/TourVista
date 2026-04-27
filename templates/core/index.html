@@ -10,6 +10,109 @@
     background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.65)), 
                 url("{% static 'img/hero.jpg' %}") center/cover no-repeat;
   }
+
+  /* Budget Planner Styles - Compact & Professional */
+  .budget-planner-section {
+    background: var(--gray-50);
+    padding: 4rem 0;
+  }
+  .budget-planner-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-100);
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 3rem;
+  }
+  .budget-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding-right: 2rem;
+    border-right: 1px solid var(--gray-100);
+  }
+  .b-accom-btn {
+    flex: 1;
+    padding: .45rem;
+    font-size: .8rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s;
+    background: transparent;
+    color: var(--gray-500);
+    border: 1px solid transparent;
+  }
+  .b-accom-btn.active {
+    background: white !important;
+    color: var(--saffron) !important;
+    box-shadow: var(--shadow-sm);
+  }
+  .budget-results {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .budget-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--navy);
+    padding: 1.25rem 1.75rem;
+    border-radius: var(--radius);
+    color: white;
+  }
+  .budget-summary .total-label {
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: rgba(255,255,255,0.6);
+  }
+  .budget-summary .total-val {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--saffron);
+  }
+  .budget-summary .per-person {
+    font-size: .85rem;
+    color: rgba(255,255,255,0.8);
+  }
+  .budget-bar-item { width: 100%; }
+  .budget-bar-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.35rem;
+  }
+  .budget-bar-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .budget-bar-amount {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .budget-bar-track {
+    height: 8px;
+    background: var(--gray-100);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .budget-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @media (max-width: 991px) {
+    .budget-planner-card { grid-template-columns: 1fr; gap: 2rem; }
+    .budget-inputs { padding-right: 0; border-right: none; border-bottom: 1px solid var(--gray-100); padding-bottom: 2rem; }
+  }
 </style>
 {% endblock %}
 
@@ -117,6 +220,83 @@
       {% endfor %}
     </div>
 
+  </div>
+</section>
+
+<!-- BUDGET PLANNER -->
+<section class="section budget-planner-section">
+  <div class="container">
+    <div class="section-header" data-aos="fade-up">
+      <span class="badge-tag">📊 Financial Planning</span>
+      <h2>Calculate Your Trip Budget</h2>
+      <p>Plan your expenses across different categories and find the perfect package that fits your wallet.</p>
+    </div>
+
+    <div class="budget-planner-card" data-aos="fade-up">
+      <div class="budget-inputs">
+        <form id="budget-form" onsubmit="return false;" style="display:contents">
+          <!-- Destination -->
+          <div class="form-group" style="margin-bottom:1rem">
+            <label class="form-label">Destination</label>
+            <select id="b-dest" class="form-control">
+              {% for val, label in states %}
+              <option value="{{ val }}">{{ label }}</option>
+              {% endfor %}
+              <option value="default">Other</option>
+            </select>
+          </div>
+
+          <!-- Stay Type -->
+          <div class="form-group" style="margin-bottom:1rem">
+            <label class="form-label">Stay Category</label>
+            <input type="hidden" id="b-accom" value="standard">
+            <div
+              style="display:flex;gap:.3rem;background:var(--gray-50);padding:.3rem;border-radius:10px;border:1px solid var(--gray-100)">
+              <button type="button" class="b-accom-btn" data-value="budget">Economy</button>
+              <button type="button" class="b-accom-btn active" data-value="standard">Standard</button>
+              <button type="button" class="b-accom-btn" data-value="luxury">Luxury</button>
+            </div>
+          </div>
+
+          <!-- Duration -->
+          <div class="form-group" style="margin-bottom:1rem">
+            <div style="display:flex;justify-content:space-between;margin-bottom:.4rem">
+              <label class="form-label" style="margin:0">Duration</label>
+              <span id="b-days-val" style="font-size:.85rem;font-weight:700;color:var(--saffron)">5 days</span>
+            </div>
+            <input type="range" id="b-days" min="1" max="30" value="5"
+              style="width:100%;accent-color:var(--saffron);cursor:pointer">
+          </div>
+
+          <!-- Travellers -->
+          <div class="form-group" style="margin-bottom:0">
+            <div style="display:flex;justify-content:space-between;margin-bottom:.4rem">
+              <label class="form-label" style="margin:0">Travellers</label>
+              <span id="b-trav-val" style="font-size:.85rem;font-weight:700;color:var(--saffron)">2 people</span>
+            </div>
+            <input type="range" id="b-travellers" min="1" max="15" value="2"
+              style="width:100%;accent-color:var(--saffron);cursor:pointer">
+          </div>
+        </form>
+      </div>
+
+      <div class="budget-results">
+        <div class="budget-summary">
+          <div>
+            <div class="total-label">Total Estimate</div>
+            <div id="budget-total" class="total-val">₹0</div>
+          </div>
+          <div style="text-align:right">
+            <div class="per-person" id="budget-per-person">₹0 per person</div>
+            <div style="font-size:.65rem;color:rgba(255,255,255,0.4);margin-top:2px">All-inclusive</div>
+          </div>
+        </div>
+
+        <div id="budget-bars" style="display:flex;flex-direction:column;gap:1rem;flex:1;justify-content:center">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 

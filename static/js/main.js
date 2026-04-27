@@ -586,6 +586,10 @@ async function loadWeather(city) {
       hotel: '#FF6B35', food: '#F59E0B', transport: '#3B82F6',
       activities: '#10B981', flights: '#8B5CF6'
     };
+    const icons = {
+      hotel: 'fa-bed', food: 'fa-utensils', transport: 'fa-car',
+      activities: 'fa-map-marked-alt', flights: 'fa-plane'
+    };
 
     const totalEl = document.getElementById('budget-total');
     const perPersonEl = document.getElementById('budget-per-person');
@@ -599,7 +603,10 @@ async function loadWeather(city) {
       return `
         <div class="budget-bar-item">
           <div class="budget-bar-info">
-            <span>${label}</span>
+            <div class="budget-bar-label">
+              <i class="fas ${icons[key]}" style="color:${colors[key]}; width:16px"></i>
+              <span>${label}</span>
+            </div>
             <span class="budget-bar-amount">₹${val.toLocaleString('en-IN')}</span>
           </div>
           <div class="budget-bar-track">

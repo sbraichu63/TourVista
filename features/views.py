@@ -202,21 +202,31 @@ def chatbot_api(request):
 # BUDGET CALCULATOR
 # ──────────────────────────────────────────────────────────────────
 BUDGET_DATA = {
-    "rajasthan": {"hotel": 3000, "food": 800, "transport": 1200, "activities": 600},
-    "goa":       {"hotel": 3500, "food": 900, "transport": 600,  "activities": 800},
-    "kerala":    {"hotel": 3200, "food": 700, "transport": 1000, "activities": 700},
-    "himachal_pradesh": {"hotel": 2500, "food": 600, "transport": 1500, "activities": 1000},
-    "kashmir":   {"hotel": 4000, "food": 800, "transport": 1800, "activities": 900},
-    "uttarakhand": {"hotel": 2000, "food": 500, "transport": 1000, "activities": 1200},
-    "maharashtra": {"hotel": 3500, "food": 900, "transport": 800, "activities": 500},
-    "andaman":   {"hotel": 4500, "food": 1000, "transport": 2000, "activities": 1500},
-    "default":   {"hotel": 3000, "food": 750, "transport": 1000, "activities": 700},
+    "rajasthan":       {"hotel": 2800, "food": 700, "transport": 1000, "activities": 500,  "flight": 4500},
+    "goa":             {"hotel": 3800, "food": 950, "transport": 700,  "activities": 900,  "flight": 5500},
+    "kerala":          {"hotel": 3400, "food": 750, "transport": 1100, "activities": 800,  "flight": 6500},
+    "himachal_pradesh":{"hotel": 2600, "food": 650, "transport": 1600, "activities": 1200, "flight": 5000},
+    "kashmir":         {"hotel": 4200, "food": 850, "transport": 2000, "activities": 1000, "flight": 7000},
+    "uttarakhand":     {"hotel": 2200, "food": 550, "transport": 1200, "activities": 1100, "flight": 4500},
+    "maharashtra":     {"hotel": 3600, "food": 900, "transport": 900,  "activities": 600,  "flight": 4000},
+    "tamil_nadu":      {"hotel": 2900, "food": 600, "transport": 1000, "activities": 500,  "flight": 6000},
+    "karnataka":       {"hotel": 3200, "food": 800, "transport": 1100, "activities": 700,  "flight": 5500},
+    "west_bengal":     {"hotel": 2700, "food": 700, "transport": 900,  "activities": 800,  "flight": 5800},
+    "gujarat":         {"hotel": 2500, "food": 750, "transport": 1200, "activities": 400,  "flight": 4800},
+    "andaman":         {"hotel": 5000, "food": 1200, "transport": 2200, "activities": 1800, "flight": 11000},
+    "uttar_pradesh":   {"hotel": 2400, "food": 600, "transport": 1100, "activities": 900,  "flight": 4000},
+    "northeast":       {"hotel": 2600, "food": 600, "transport": 1800, "activities": 1200, "flight": 8500},
+    "punjab":          {"hotel": 2200, "food": 800, "transport": 1000, "activities": 400,  "flight": 4500},
+    "madhya_pradesh":  {"hotel": 2100, "food": 500, "transport": 1100, "activities": 700,  "flight": 5000},
+    "tripura":         {"hotel": 1900, "food": 450, "transport": 1400, "activities": 500,  "flight": 8000},
+    "default":         {"hotel": 2800, "food": 700, "transport": 1000, "activities": 700,  "flight": 5000},
 }
 
-ACCOMMODATION_MULTIPLIERS = {
-    "budget": 0.5,
-    "standard": 1.0,
-    "luxury": 2.5,
+# Multipliers for different categories based on stay type
+STAY_MULTIPLIERS = {
+    "budget":   {"hotel": 0.5, "food": 0.6, "transport": 0.8, "activities": 0.7, "flight": 1.0},
+    "standard": {"hotel": 1.0, "food": 1.0, "transport": 1.0, "activities": 1.0, "flight": 1.0},
+    "luxury":   {"hotel": 3.5, "food": 2.5, "transport": 2.2, "activities": 2.0, "flight": 2.5},
 }
 
 def budget_calculator(request):
@@ -226,22 +236,27 @@ def budget_calculator(request):
     accommodation = request.GET.get('accommodation', 'standard')
 
     base = BUDGET_DATA.get(destination, BUDGET_DATA['default'])
-    multiplier = ACCOMMODATION_MULTIPLIERS.get(accommodation, 1.0)
+    mults = STAY_MULTIPLIERS.get(accommodation, STAY_MULTIPLIERS['standard'])
 
-    hotel_per_day = base['hotel'] * multiplier
-    food_per_day = base['food']
-    transport_total = base['transport'] * (1 + (travellers - 1) * 0.3)
-    activities_per_day = base['activities']
+    # Calculate per category
+    hotel_per_day = base['hotel'] * mults['hotel']
+    food_per_day = base['food'] * mults['food']
+    activities_per_day = base['activities'] * mults['activities']
+    
+    # Transport scaling (slightly less per person for groups)
+    transport_base = base['transport'] * mults['transport']
+    transport_total = transport_base * days * (1 + (travellers - 1) * 0.4)
+    
+    # Flights (one-time per person)
+    flight_per_person = base['flight'] * mults['flight']
+    flight_total = flight_per_person * travellers
 
-    # Flight estimate (India domestic)
-    flight_estimate = 6000 if travellers >= 1 else 0
-
-    hotel_total = hotel_per_day * days
+    hotel_total = hotel_per_day * days * travellers
     food_total = food_per_day * days * travellers
     activities_total = activities_per_day * days * travellers
 
-    per_person = (hotel_total + food_total + transport_total + activities_total + flight_estimate) / max(travellers, 1)
-    grand_total = hotel_total + food_total + transport_total + activities_total + flight_estimate
+    grand_total = hotel_total + food_total + transport_total + activities_total + flight_total
+    per_person = grand_total / max(travellers, 1)
 
     return JsonResponse({
         "breakdown": {
@@ -249,13 +264,14 @@ def budget_calculator(request):
             "food": round(food_total),
             "transport": round(transport_total),
             "activities": round(activities_total),
-            "flights": round(flight_estimate),
+            "flights": round(flight_total),
         },
         "per_person": round(per_person),
         "grand_total": round(grand_total),
         "days": days,
         "travellers": travellers,
-        "destination": destination,
+        "destination": destination.replace('_', ' ').title(),
+        "tier": accommodation.title()
     })
 
 

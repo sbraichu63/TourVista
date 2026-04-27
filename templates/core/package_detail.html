@@ -260,7 +260,7 @@
                   <span style="font-size:.8rem;color:var(--gray-500);width:15px">{{ item.rating }}</span>
                   <i class="fas fa-star" style="color:#F59E0B;font-size:.75rem"></i>
                   <div style="flex:1;height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden">
-                    <div style="height:100%;background:#F59E0B;width:{{ item.percent }}&#37;;border-radius:3px"></div>
+                    <div style="height:100%;background:#F59E0B;width:{{ item.percent }}%;border-radius:3px"></div>
                   </div>
                   <span style="font-size:.75rem;color:var(--gray-400);width:20px;text-align:right">{{ item.count }}</span>
                 </div>
@@ -313,8 +313,8 @@
                 <label class="form-label">Your Rating</label>
                 <div class="star-rating" style="display:flex;flex-direction:row-reverse;justify-content:flex-end">
                   {% for i in "54321" %}
-                  <input type="radio" id="star{{ forloop.counter }}" name="rating" value="{{ forloop.counter }}">
-                  <label for="star{{ forloop.counter }}"><i class="fas fa-star"
+                  <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" {% if forloop.last %}required{% endif %}>
+                  <label for="star{{ i }}" aria-label="{{ i }} star rating"><i class="fas fa-star"
                       style="font-size:1.6rem;color:var(--gray-300);cursor:pointer"></i></label>
                   {% endfor %}
                 </div>
@@ -461,15 +461,18 @@
 {% endblock %}
 
 {% block extra_js %}
+<script id="places-json" type="application/json">{{ places_json|default:'[]'|safe }}</script>
 <script>
   {% if package.city_name %}
-  loadWeather('{{ package.city_name }}');
+    if (typeof loadWeather === 'function') {
+      loadWeather('{{ package.city_name|escapejs }}');
+    }
   {% endif %}
 
   // ── PLACE HOVER TOOLTIP ──────────────────────────────────────────
   (function () {
-    const PLACES = {{ places_json|safe }};
-  if (!PLACES || PLACES.length === 0) return;
+    const PLACES = JSON.parse(document.getElementById('places-json')?.textContent || '[]');
+    if (!Array.isArray(PLACES) || PLACES.length === 0) return;
 
   // Sort by name length desc to match longer names first (e.g. "Ranthambore Fort" before "Ranthambore")
   PLACES.sort((a, b) => b.name.length - a.name.length);
@@ -492,16 +495,33 @@
 
   let currentTarget = null;
 
+  function escapeHtml(value) {
+    return String(value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function safeImageUrl(url) {
+    const value = String(url || '').trim();
+    if (!value) return '';
+    if (value.startsWith('/') || value.startsWith('http://') || value.startsWith('https://')) return value;
+    return '';
+  }
+
   function showTooltip(el, place) {
-    const imgHtml = place.image_url ? `<div style="height:180px;width:100%;background:url('${place.image_url}') center/cover;position:relative"><div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(transparent, rgba(15,23,42,0.95))"></div></div>` : '';
+    const imageUrl = safeImageUrl(place.image_url);
+    const imgHtml = imageUrl ? `<div style="height:180px;width:100%;background:url('${encodeURI(imageUrl)}') center/cover;position:relative"><div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(transparent, rgba(15,23,42,0.95))"></div></div>` : '';
     tooltip.innerHTML = `
       ${imgHtml}
       <div style="padding:18px 22px 24px 22px;">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          <span style="font-size:1.6rem;line-height:1">${place.emoji}</span>
-          <span style="font-size:1.15rem;font-weight:700;color:#F8FAFC;letter-spacing:-.01em">${place.name}</span>
+          <span style="font-size:1.6rem;line-height:1">${escapeHtml(place.emoji || '📍')}</span>
+          <span style="font-size:1.15rem;font-weight:700;color:#F8FAFC;letter-spacing:-.01em">${escapeHtml(place.name)}</span>
         </div>
-        <p style="margin:0;font-size:.92rem;color:rgba(203,213,225,0.95);line-height:1.6">${place.specialty}</p>
+        <p style="margin:0;font-size:.92rem;color:rgba(203,213,225,0.95);line-height:1.6">${escapeHtml(place.specialty)}</p>
         <div style="margin-top:12px;font-size:.8rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(251,146,60,0.9);display:flex;align-items:center;gap:6px">
           <span style="width:6px;height:6px;border-radius:50%;background:#FB923C;display:inline-block"></span>
           Hover to Explore
@@ -595,6 +615,16 @@
 </script>
 
 <style>
+  .star-rating input {
+    display: none;
+  }
+
+  .star-rating label:hover i,
+  .star-rating label:hover ~ label i,
+  .star-rating input:checked ~ label i {
+    color: #F59E0B !important;
+  }
+
   .place-tag {
     position: relative;
     display: inline;

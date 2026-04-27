@@ -57,3 +57,4 @@ class ReviewAdmin(admin.ModelAdmin):
 class WishlistAdmin(admin.ModelAdmin):
     list_display = ('user', 'package', 'added_at')
     search_fields = ('user__username', 'package__title')
+

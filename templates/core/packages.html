@@ -85,15 +85,21 @@
             <strong style="color:var(--navy)">{{ total_count }}</strong> packages found
           </span>
           <div style="display:flex;align-items:center;gap:.75rem">
-            <span style="font-size:.85rem;color:var(--gray-500)">Sort by:</span>
-            <select onchange="sortPackages(this.value)" style="border:1px solid var(--gray-200);border-radius:8px;padding:.4rem .8rem;font-size:.88rem;color:var(--gray-700);background:var(--white);outline:none">
-              <option value="featured" {% if sort == 'featured' %}selected{% endif %}>Featured</option>
-              <option value="deals" {% if sort == 'deals' %}selected{% endif %}>Best Deals</option>
-              <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
-              <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
-              <option value="duration" {% if sort == 'duration' %}selected{% endif %}>Duration</option>
-              <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
-            </select>
+            <span style="font-size:.85rem;font-weight:600;color:var(--gray-500);letter-spacing:.02em">Sort by:</span>
+            <div style="position:relative;display:inline-flex;align-items:center">
+              <select onchange="sortPackages(this.value)"
+                style="appearance:none;-webkit-appearance:none;border:1.5px solid var(--gray-200);border-radius:10px;padding:.45rem 2.5rem .45rem 1rem;font-size:.88rem;font-weight:600;color:var(--navy);background:white;outline:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:border-color .2s,box-shadow .2s;font-family:inherit"
+                onfocus="this.style.borderColor='var(--saffron)';this.style.boxShadow='0 0 0 3px rgba(249,115,22,.12)'"
+                onblur="this.style.borderColor='var(--gray-200)';this.style.boxShadow='0 2px 8px rgba(0,0,0,.06)'">
+                <option value="featured" {% if sort == 'featured' %}selected{% endif %}>⭐ Featured</option>
+                <option value="deals" {% if sort == 'deals' %}selected{% endif %}>🔥 Best Deals</option>
+                <option value="price_low" {% if sort == 'price_low' %}selected{% endif %}>💰 Price: Low to High</option>
+                <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>💎 Price: High to Low</option>
+                <option value="duration" {% if sort == 'duration' %}selected{% endif %}>📅 Duration</option>
+                <option value="newest" {% if sort == 'newest' %}selected{% endif %}>🆕 Newest</option>
+              </select>
+              <i class="fas fa-chevron-down" style="position:absolute;right:.75rem;pointer-events:none;font-size:.7rem;color:var(--gray-500)"></i>
+            </div>
           </div>
         </div>
 

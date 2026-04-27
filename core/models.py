@@ -36,7 +36,8 @@ SEASONS = [
     ('all', 'All Year'),
     ('summer', 'Summer (Mar–Jun)'),
     ('monsoon', 'Monsoon (Jul–Sep)'),
-    ('winter', 'Winter (Oct–Feb)'),
+    ('autumn', 'Autumn (Oct–Nov)'),
+    ('winter', 'Winter (Dec–Feb)'),
 ]
 
 TRANSPORT_CHOICES = [

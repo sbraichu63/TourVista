@@ -194,7 +194,15 @@ def toggle_wishlist(request, pk):
 # SEASONS PAGE
 # ──────────────────────────────────────────────────────────────────
 def seasons_view(request):
-    return render(request, 'core/seasons.html')
+    packages = TourPackage.objects.filter(is_active=True)
+    months = [
+        "January", "February", "March", "April", "May", "June", 
+        "July", "August", "September", "October", "November", "December"
+    ]
+    return render(request, 'core/seasons.html', {
+        'packages': packages,
+        'months': months
+    })
 
 
 # ──────────────────────────────────────────────────────────────────

@@ -1,133 +1,464 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}India Travel Seasons Guide{% endblock %}
+
+{% block title %}Best Time to Visit India — Interactive Travel Guide{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --winter-grad: linear-gradient(135deg, #1E3A8A, #3B82F6);
+    --summer-grad: linear-gradient(135deg, #B45309, #F59E0B);
+    --monsoon-grad: linear-gradient(135deg, #065F46, #10B981);
+    --autumn-grad: linear-gradient(135deg, #9333ea, #db2777);
+  }
+
+  .seasons-container {
+    background: #f8fafc;
+    min-height: 100vh;
+    padding-bottom: 5rem;
+  }
+
+  /* Month Navigator */
+  .month-nav-wrapper {
+    background: white;
+    padding: 1.5rem 0;
+    position: sticky;
+    top: 70px;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 3rem;
+  }
+
+  .month-nav {
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding: 0.5rem 1rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .month-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .month-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 999px;
+    background: var(--gray-50);
+    color: var(--gray-600);
+    font-weight: 700;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+  }
+
+  .month-btn:hover {
+    background: white;
+    border-color: var(--saffron);
+    color: var(--saffron);
+    transform: translateY(-2px);
+  }
+
+  .month-btn.active {
+    background: var(--navy);
+    color: white;
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.2);
+  }
+
+  /* Content Display */
+  .display-section {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease;
+    display: none;
+  }
+
+  .display-section.active {
+    opacity: 1;
+    transform: translateY(0);
+    display: block;
+  }
+
+  .season-hero-card {
+    background: white;
+    border-radius: 2rem;
+    overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.08);
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    margin-bottom: 4rem;
+    border: 1px solid var(--gray-100);
+  }
+
+  .season-info-panel {
+    padding: 3rem;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .season-info-panel .ghost-icon {
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    font-size: 12rem;
+    opacity: 0.15;
+    transform: rotate(-15deg);
+    pointer-events: none;
+  }
+
+  .season-details-panel {
+    padding: 3rem;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .recommendation-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  .rec-card {
+    background: #f8fafc;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    border-left: 4px solid var(--saffron);
+    transition: var(--transition);
+    border-top: 1px solid var(--gray-100);
+    border-right: 1px solid var(--gray-100);
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  .rec-card:hover {
+    transform: translateY(-3px);
+    background: white;
+    box-shadow: var(--shadow-md);
+  }
+
+  .rec-card h4 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--gray-500);
+    margin-bottom: 0.75rem;
+  }
+
+  .rec-card p {
+    color: var(--navy);
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  /* Floating Package Cards */
+  .package-strip {
+    margin-top: 5rem;
+  }
+
+  .section-title-alt {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .section-title-alt h2 {
+    font-size: 2.25rem;
+    color: var(--navy);
+  }
+
+  @media (max-width: 992px) {
+    .season-hero-card {
+      grid-template-columns: 1fr;
+    }
+
+    .season-info-panel,
+    .season-details-panel {
+      padding: 2.5rem;
+    }
+
+    .month-nav {
+      justify-content: flex-start;
+    }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="page-hero">
+<div class="seasons-container">
+
+  <!-- HERO -->
+  <section class="page-hero"
+    style="background: linear-gradient(135deg, var(--navy), var(--teal-dark)); padding: 6rem 0;">
+    <div class="container text-center">
+      <div class="badge-tag"
+        style="background: rgba(255,255,255,0.12); color: white; border: 1px solid rgba(255,255,255,0.2); margin-bottom: 1.5rem;">
+        🌍 Interactive Planning Guide
+      </div>
+      <h1 style="color: white; font-size: 3.5rem; margin-bottom: 1rem;">Experience India in its Best Light</h1>
+      <p style="color: rgba(255,255,255,0.8); font-size: 1.25rem; max-width: 700px; margin: 0 auto;">
+        India's magic changes with the moon and the sun. Select a month to discover your perfect destination.
+      </p>
+    </div>
+  </section>
+
+  <!-- MONTH NAV -->
+  <div class="month-nav-wrapper">
+    <div class="container">
+      <div class="month-nav" id="month-nav">
+        {% for m in months %}
+        <button class="month-btn" data-month="{{ m }}">{{ m }}</button>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
   <div class="container">
-    <div class="badge-tag" style="background:rgba(255,255,255,.12);color:white;border-color:rgba(255,255,255,.25);margin-bottom:1rem">🌤️ Travel Guide</div>
-    <h1>Best Time to Visit India</h1>
-    <p>Plan your perfect India trip — know the seasons, the festivals, and the ideal time for each destination.</p>
+    <div id="display-container">
+      <!-- Content will be injected here via JS -->
+    </div>
+
+    <!-- Live Package Recommendations -->
+    <div class="package-strip" id="package-recommendations" style="display: none;">
+      <div class="section-title-alt">
+        <h2>Recommended Packages for this Season</h2>
+        <p>Curated tours that peak during your selected time</p>
+      </div>
+      <div class="package-grid" id="recommended-packages-grid">
+        <!-- Filtered packages will appear here -->
+      </div>
+    </div>
   </div>
 </div>
 
-<section class="section" style="background:var(--ivory)">
-  <div class="container">
-    <div class="section-header" data-aos>
-      <h2>India's Four Travel Seasons</h2>
-      <p>India's diverse geography means different regions peak in different seasons. Here's your complete guide.</p>
-    </div>
+<!-- DATA FOR JS -->
+<script id="season-data" type="application/json">
+{
+  "Winter": {
+    "months": ["December", "January", "February"],
+    "gradient": "var(--winter-grad)",
+    "image": "https://images.unsplash.com/photo-1483921020237-2ff51e8e4b22?w=800&q=80",
+    "icon": "❄️",
+    "title": "Winter Peak Season",
+    "desc": "The quintessential Indian travel experience. Cool breezes, clear blue skies, and vibrant festivals make this the absolute best time for sightseeing and luxury travel.",
+    "temp": "12°C - 25°C",
+    "festivals": "Rann Utsav, Republic Day, Christmas, New Year",
+    "regions": {
+      "North": "Rajasthan (Jaipur, Udaipur), Agra, Varanasi",
+      "South": "Kerala, Pondicherry, Hampi",
+      "West": "Goa, Gujarat (Kutch)",
+      "East": "Odisha, Kolkata"
+    }
+  },
+  "Summer": {
+    "months": ["March", "April", "May", "June"],
+    "gradient": "var(--summer-grad)",
+    "image": "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&q=80",
+    "icon": "☀️",
+    "title": "Summer — The Himalayan Escape",
+    "desc": "While the plains heat up, the mighty Himalayas and Southern hill stations come to life. This is the prime season for trekking, adventure sports, and escaping the heat.",
+    "temp": "15°C - 38°C (Hills: 10°C - 20°C)",
+    "festivals": "Holi, Baisakhi, Shimla Summer Festival",
+    "regions": {
+      "North": "Manali, Leh-Ladakh, Spiti Valley",
+      "South": "Ooty, Munnar, Coorg",
+      "West": "Mahabaleshwar, Matheran",
+      "East": "Sikkim, Darjeeling"
+    }
+  },
+  "Monsoon": {
+    "months": ["July", "August", "September"],
+    "gradient": "var(--monsoon-grad)",
+    "image": "https://images.unsplash.com/photo-1444491741275-3747c53c99b4?w=800&q=80",
+    "icon": "🌧️",
+    "title": "Monsoon — The Emerald Season",
+    "desc": "India transforms into a lush green paradise. The scent of petrichor and the sight of cascading waterfalls make it a romantic and budget-friendly time to explore.",
+    "temp": "24°C - 32°C",
+    "festivals": "Onam, Raksha Bandhan, Ganesh Chaturthi",
+    "regions": {
+      "North": "Valley of Flowers, Udaipur (Lake City)",
+      "South": "Kerala (Ayurveda), Wayanad",
+      "West": "Lonavala, Goa (Lush Greenery)",
+      "East": "Meghalaya (Cherrapunji)"
+    }
+  },
+  "Autumn": {
+    "months": ["October", "November"],
+    "gradient": "var(--autumn-grad)",
+    "image": "https://images.unsplash.com/photo-1507783548227-544c3b8fc065?w=800&q=80",
+    "icon": "🍂",
+    "title": "Autumn — The Festive Season",
+    "desc": "As the monsoon fades, India enters its most vibrant festive period. The air is crisp, the skies are clear, and the culture comes alive with Diwali and heritage celebrations.",
+    "temp": "20°C - 30°C",
+    "festivals": "Diwali, Durga Puja, Dussehra, Pushkar Camel Fair",
+    "regions": {
+      "North": "Amritsar, Varanasi, Delhi Heritage",
+      "South": "Mysore (Dussehra), Madurai, Hampi",
+      "West": "Mumbai, Pune, Aurangabad",
+      "East": "Kolkata (Durga Puja), Darjeeling"
+    }
+  }
+}
+</script>
 
-    <div class="season-grid">
-      <!-- Winter -->
-      <div class="season-card" data-aos>
-        <div class="season-card-header" style="background:linear-gradient(135deg,#1E3A5F,#0A7EA4)">
-          <div class="icon">❄️</div>
-          <h3>Winter Peak Season</h3>
-          <p><strong>October – February</strong></p>
-          <p>The best time to visit most of India. Pleasant temperatures, clear skies, major festivals, and peak tourist activity.</p>
-        </div>
-        <div class="season-card-body">
-          <div style="font-size:.82rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">Best Destinations</div>
-          <div class="season-dest">
-            <span>🏰 Rajasthan</span><span>🏖️ Goa</span><span>🕌 Agra (Taj Mahal)</span>
-            <span>🌺 Kerala</span><span>🐘 Karnataka</span><span>🌊 Andaman</span>
+<script id="packages-data" type="application/json">
+[
+  {% for p in packages %}
+  {
+    "id": "{{ p.id }}",
+    "title": "{{ p.title|escapejs }}",
+    "slug": "{{ p.slug }}",
+    "image": "{% if p.main_image %}{{ p.main_image.url }}{% else %}/static/img/placeholder.jpg{% endif %}",
+    "price": "{{ p.price_per_person }}",
+    "duration": "{{ p.duration_days }}",
+    "season": "{{ p.best_season }}",
+    "state": "{{ p.get_state_display|escapejs }}"
+  }{% if not forloop.last %},{% endif %}
+  {% endfor %}
+]
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const seasonData = JSON.parse(document.getElementById('season-data').textContent);
+    const packagesData = JSON.parse(document.getElementById('packages-data').textContent);
+    const monthBtns = document.querySelectorAll('.month-btn');
+    const container = document.getElementById('display-container');
+    const pkgContainer = document.getElementById('package-recommendations');
+    const pkgGrid = document.getElementById('recommended-packages-grid');
+
+    function updateDisplay(month) {
+      // Find season
+      let currentSeasonKey = "";
+      let currentSeason = null;
+
+      for (const [key, data] of Object.entries(seasonData)) {
+        if (data.months.includes(month)) {
+          currentSeasonKey = key;
+          currentSeason = data;
+          break;
+        }
+      }
+
+      if (!currentSeason) return;
+
+      // Build Content
+      container.innerHTML = `
+      <div class="display-section active">
+        <div class="season-hero-card">
+          <div class="season-info-panel" style="background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.55)), url('${currentSeason.image}'); background-size: cover; background-position: center;">
+            <div style="font-size: 3.5rem; margin-bottom: 1.5rem; position: relative; z-index: 2;">${currentSeason.icon}</div>
+            <h2 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 1rem; position: relative; z-index: 2; color: white; text-shadow: 0 2px 12px rgba(0,0,0,0.4);">${currentSeason.title}</h2>
+            <p style="font-size: 1.05rem; line-height: 1.6; opacity: 0.95; position: relative; z-index: 2; margin-bottom: 2rem; color: rgba(255,255,255,0.92);">${currentSeason.desc}</p>
+            
+            <div style="display: flex; gap: 2rem; position: relative; z-index: 2;">
+              <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); border-radius: 12px; padding: 0.75rem 1.25rem; border: 1px solid rgba(255,255,255,0.2);">
+                <div style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; opacity: 0.85; letter-spacing: 0.05em; color: white;">🌡️ Avg Temp</div>
+                <div style="font-size: 1.1rem; font-weight: 800; color: white;">${currentSeason.temp}</div>
+              </div>
+              <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); border-radius: 12px; padding: 0.75rem 1.25rem; border: 1px solid rgba(255,255,255,0.2);">
+                <div style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; opacity: 0.85; letter-spacing: 0.05em; color: white;">📅 Peak Season</div>
+                <div style="font-size: 1.1rem; font-weight: 800; color: white;">${currentSeasonKey}</div>
+              </div>
+            </div>
           </div>
-          <div style="margin-top:.9rem;font-size:.83rem;color:var(--gray-600)"><strong>Avg Temp:</strong> 12–25°C</div>
-          <div style="font-size:.83rem;color:var(--gray-600)"><strong>Festivals:</strong> Diwali, Christmas, Pushkar Fair, Rann Utsav</div>
-        </div>
-      </div>
 
-      <!-- Summer -->
-      <div class="season-card" data-aos data-aos-delay="100">
-        <div class="season-card-header" style="background:linear-gradient(135deg,#B45309,#F59E0B)">
-          <div class="icon">☀️</div>
-          <h3>Summer — Hill Stations</h3>
-          <p><strong>March – June</strong></p>
-          <p>Hot in plains, perfect for hills! Escape to Himalayas, Western Ghats hill stations. Adventure season in mountains.</p>
-        </div>
-        <div class="season-card-body">
-          <div style="font-size:.82rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">Best Destinations</div>
-          <div class="season-dest">
-            <span>🏔️ Manali</span><span>🌲 Shimla</span><span>🍵 Darjeeling</span>
-            <span>🌿 Ooty</span><span>☕ Coorg</span><span>⛷️ Gulmarg</span>
+          <div class="season-details-panel">
+            <div>
+              <h3 style="color: var(--navy); margin-bottom: 1.25rem; font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; gap: 0.6rem;">
+                <span style="font-size: 1.2rem;">🌍</span> Regional Guide
+              </h3>
+              <div class="recommendation-grid">
+                <div class="rec-card">
+                  <h4>North India</h4>
+                  <p>${currentSeason.regions.North}</p>
+                </div>
+                <div class="rec-card" style="border-left-color: var(--teal)">
+                  <h4>South India</h4>
+                  <p>${currentSeason.regions.South}</p>
+                </div>
+                <div class="rec-card" style="border-left-color: var(--navy)">
+                  <h4>West India</h4>
+                  <p>${currentSeason.regions.West}</p>
+                </div>
+                <div class="rec-card" style="border-left-color: var(--success)">
+                  <h4>East India</h4>
+                  <p>${currentSeason.regions.East}</p>
+                </div>
+              </div>
+            </div>
+
+            <div style="padding: 1.5rem; background: #f1f5f9; border-radius: 1rem; border: 1px solid var(--gray-200);">
+              <h4 style="font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: var(--gray-500); margin-bottom: 0.75rem; letter-spacing: 0.05em;">
+                🎊 Major Festivals in ${month}
+              </h4>
+              <p style="margin: 0; color: var(--navy); font-weight: 600; line-height: 1.5; font-size: 0.95rem;">${currentSeason.festivals}</p>
+            </div>
           </div>
-          <div style="margin-top:.9rem;font-size:.83rem;color:var(--gray-600)"><strong>Avg Temp:</strong> Hills 10–20°C, Plains 35–45°C</div>
-          <div style="font-size:.83rem;color:var(--gray-600)"><strong>Festivals:</strong> Holi, Baisakhi, Summer Treks</div>
         </div>
       </div>
+    `;
 
-      <!-- Monsoon -->
-      <div class="season-card" data-aos data-aos-delay="200">
-        <div class="season-card-header" style="background:linear-gradient(135deg,#065F46,#10B981)">
-          <div class="icon">🌧️</div>
-          <h3>Monsoon — Lush & Green</h3>
-          <p><strong>July – September</strong></p>
-          <p>India transforms into a lush green paradise. Perfect for budget travel, waterfalls, and Kerala / Northeast.</p>
-        </div>
-        <div class="season-card-body">
-          <div style="font-size:.82rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">Best Destinations</div>
-          <div class="season-dest">
-            <span>🌴 Kerala</span><span>🌺 Coorg</span><span>💧 Meghalaya</span>
-            <span>🌿 Assam</span><span>🏔️ Ladakh (Rain Shadow)</span><span>🏰 Mysore</span>
+      // Filter Packages
+      const seasonMapping = {
+        "Winter": "winter",
+        "Summer": "summer",
+        "Monsoon": "monsoon",
+        "Autumn": "autumn"
+      };
+
+      const filtered = packagesData.filter(p => p.season === seasonMapping[currentSeasonKey]).slice(0, 12);
+
+      if (filtered.length > 0) {
+        pkgContainer.style.display = 'block';
+        pkgGrid.innerHTML = filtered.map(p => `
+        <div class="package-card" data-aos="fade-up">
+          <div class="package-card-img">
+            <img src="${p.image}" alt="${p.title}">
+            <div class="card-badge">${p.state}</div>
           </div>
-          <div style="margin-top:.9rem;font-size:.83rem;color:var(--gray-600)"><strong>Avg Temp:</strong> 24–32°C</div>
-          <div style="font-size:.83rem;color:var(--gray-600)"><strong>Festivals:</strong> Onam, Raksha Bandhan, Ganesh Chaturthi</div>
-        </div>
-      </div>
-
-      <!-- Post-Monsoon -->
-      <div class="season-card" data-aos data-aos-delay="300">
-        <div class="season-card-header" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">
-          <div class="icon">🌅</div>
-          <h3>Post-Monsoon — Festive</h3>
-          <p><strong>September – October</strong></p>
-          <p>Transition season with clear skies, greenery, festivals, and comfortable temperatures everywhere in India.</p>
-        </div>
-        <div class="season-card-body">
-          <div style="font-size:.82rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">Best Destinations</div>
-          <div class="season-dest">
-            <span>🐅 Jim Corbett</span><span>🦁 Ranthambore</span><span>🧘 Rishikesh</span>
-            <span>❄️ Kashmir</span><span>🏖️ Goa (Starting)</span><span>🌄 Sikkim</span>
+          <div class="package-card-body">
+            <div class="card-meta">
+              <span><i class="far fa-clock"></i> ${p.duration} Days</span>
+              <span><i class="far fa-calendar-alt"></i> ${p.season.charAt(0).toUpperCase() + p.season.slice(1)}</span>
+            </div>
+            <h3 class="card-title"><a href="/packages/${p.slug}/">${p.title}</a></h3>
+            <div class="card-footer">
+              <div class="card-price">
+                <span class="final">₹${parseFloat(p.price).toLocaleString()}</span>
+                <span class="per">/person</span>
+              </div>
+              <a href="/packages/${p.slug}/" class="btn btn-primary btn-sm btn-icon"><i class="fas fa-arrow-right"></i></a>
+            </div>
           </div>
-          <div style="margin-top:.9rem;font-size:.83rem;color:var(--gray-600)"><strong>Avg Temp:</strong> 18–28°C</div>
-          <div style="font-size:.83rem;color:var(--gray-600)"><strong>Festivals:</strong> Navratri, Dussehra, Diwali</div>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
+      `).join('');
+      } else {
+        pkgContainer.style.display = 'none';
+      }
+    }
 
-<!-- Festival Calendar -->
-<section class="section">
-  <div class="container">
-    <div class="section-header" data-aos>
-      <div class="badge-tag"><i class="fas fa-calendar-star"></i> Festival Calendar</div>
-      <h2>Major India Festivals by Month</h2>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem">
-      {% for item in "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec" %}
-      <div style="background:white;border-radius:var(--radius);padding:1.1rem;box-shadow:var(--shadow-sm);border:1px solid var(--gray-100)" data-aos>
-        <div style="font-size:.72rem;font-weight:800;color:var(--saffron);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem">{{ item }}</div>
-        <div style="font-size:.9rem;font-weight:700;color:var(--navy)">
-          {% cycle 'Republic Day, Lohri' 'Vasant Panchami' 'Holi, Ugadi' 'Baisakhi, Ram Navami' 'Buddha Purnima' 'Eid ul-Fitr' 'Rath Yatra' 'Raksha Bandhan' 'Onam, Ganesh Chaturthi' 'Navratri, Dussehra, Diwali' 'Chhath Puja' 'Christmas, New Year' %}
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
+    // Handle Clicks
+    monthBtns.forEach(btn => {
+      btn.addEventListener('click', function () {
+        monthBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        updateDisplay(this.dataset.month);
+      });
+    });
 
-<!-- CTA -->
-<section style="background:linear-gradient(135deg,var(--navy),var(--teal-dark));padding:4rem 0;text-align:center">
-  <div class="container" data-aos>
-    <h2 style="color:white;margin-bottom:.75rem">Find Your Perfect Season</h2>
-    <p style="color:rgba(255,255,255,.7);margin-bottom:1.5rem">Browse packages filtered by best travel season</p>
-    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
-      <a href="{% url 'core:packages' %}?season=winter" class="btn btn-white">❄️ Winter Packages</a>
-      <a href="{% url 'core:packages' %}?season=summer" class="btn" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3)">☀️ Summer Packages</a>
-      <a href="{% url 'core:packages' %}?season=monsoon" class="btn" style="background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3)">🌧️ Monsoon Packages</a>
-    </div>
-  </div>
-</section>
+    // Default to current month or October
+    const currentMonthName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date());
+    const defaultBtn = document.querySelector(`[data-month="${currentMonthName}"]`) || document.querySelector('[data-month="October"]');
+    if (defaultBtn) defaultBtn.click();
+  });
+</script>
 {% endblock %}

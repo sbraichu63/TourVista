@@ -234,7 +234,7 @@ def budget_calculator(request):
     activities_per_day = base['activities']
 
     # Flight estimate (India domestic)
-    flight_estimate = 4500 if travellers >= 1 else 0
+    flight_estimate = 6000 if travellers >= 1 else 0
 
     hotel_total = hotel_per_day * days
     food_total = food_per_day * days * travellers

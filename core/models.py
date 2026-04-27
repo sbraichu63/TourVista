@@ -23,7 +23,16 @@ INDIAN_STATES = [
     ('northeast', 'Northeast India'),
     ('punjab', 'Punjab'),
     ('madhya_pradesh', 'Madhya Pradesh'),
-]
+    ('tripura','Tripura'),
+    ('manipur','Manipur'),
+    ('meghalaya','Meghalaya'),
+    ('arunachal_pradesh','Arunachal Pradesh'),
+    ('sikkim','Sikkim'),
+    ('nagaland','Nagaland'),
+    ('mizoram','Mizoram'),
+    ('assam','Assam'),
+    
+] 
 
 DIFFICULTY_LEVELS = [
     ('easy', 'Easy'),

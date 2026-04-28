@@ -27,61 +27,15 @@
     {% endif %}
   </div>
 
-  <!-- Hotel & Transport Details Card -->
-  {% if package.hotel_name or package.transport_details %}
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem">
-    {% if package.hotel_name %}
-    <div
-      style="background:white;border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow-sm);border-left:4px solid var(--saffron);display:flex;align-items:flex-start;gap:1rem">
-      <div
-        style="width:44px;height:44px;background:linear-gradient(135deg,#FF8C00,#FF6B35);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">
-        🏨</div>
-      <div>
-        <div
-          style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-400);margin-bottom:.2rem">
-          Your Hotel</div>
-        <div style="font-size:.95rem;font-weight:700;color:var(--navy)">{{ package.hotel_name }}</div>
-        {% if package.hotel_star_rating %}
-        <div style="margin-top:.3rem">
-          {% for i in "12345" %}
-          {% if forloop.counter <= package.hotel_star_rating %} <i class="fas fa-star"
-            style="color:#F59E0B;font-size:.7rem"></i>
-            {% else %}
-            <i class="far fa-star" style="color:var(--gray-300);font-size:.7rem"></i>
-            {% endif %}
-            {% endfor %}
-            <span style="font-size:.78rem;color:var(--gray-500);margin-left:.3rem">{{ package.hotel_star_rating
-              }}-Star</span>
-        </div>
-        {% endif %}
-      </div>
-    </div>
-    {% endif %}
-    {% if package.transport_details %}
-    <div
-      style="background:white;border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow-sm);border-left:4px solid var(--teal);display:flex;align-items:flex-start;gap:1rem">
-      <div
-        style="width:44px;height:44px;background:linear-gradient(135deg,#0EA5E9,#0284C7);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">
-        🚗</div>
-      <div>
-        <div
-          style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-400);margin-bottom:.2rem">
-          Transport</div>
-        <div style="font-size:.9rem;font-weight:600;color:var(--navy);line-height:1.4">{{ package.transport_details }}
-        </div>
-      </div>
-    </div>
-    {% endif %}
-  </div>
-  {% endif %}
 
   <!-- Tabs -->
   <div class="detail-tabs">
     <button class="tab-btn active" data-tab="tab-overview">Overview</button>
     <button class="tab-btn" data-tab="tab-itinerary">Itinerary</button>
     <button class="tab-btn" data-tab="tab-includes">Includes</button>
+    <button class="tab-btn" data-tab="tab-hotel">Hotel Info</button>
+    <button class="tab-btn" data-tab="tab-transport">Transport</button>
     <button class="tab-btn" data-tab="tab-reviews">Reviews ({{ review_count }})</button>
-    <button class="tab-btn" data-tab="tab-map">Map &amp; Weather</button>
   </div>
 
   <!-- Overview -->
@@ -257,45 +211,139 @@
     {% endif %}
   </div>
 
-  <!-- Map & Weather -->
-  <div class="tab-panel" id="tab-map">
-    <div class="map-weather-wrapper" style="display:grid;grid-template-columns:1fr 340px;gap:1.5rem">
-      <div class="map-container-box"
-        style="background:white;border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow-sm)">
-        <h3
-          style="font-size:1.05rem;font-family:var(--font-body);font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
-          <i class="fas fa-map-marked-alt" style="color:var(--saffron)"></i> Interactive Location Map
-        </h3>
-        <div id="india-map"
-          style="height:420px;border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--gray-100)"></div>
-        <p style="margin-top:.75rem;font-size:.78rem;color:var(--gray-500)">
-          <i class="fas fa-info-circle"></i> Explore the geographic beauty and key destinations of this package.
-        </p>
+  <!-- Hotel Details -->
+  <div class="tab-panel" id="tab-hotel">
+    <div class="premium-stay-card">
+      <div class="card-hero">
+        <div class="hero-content">
+          <div class="badge-elite"><i class="fas fa-award"></i> Elite Stay Selection</div>
+          <h2>{{ package.hotel_name|default:"Luxury Residency" }}</h2>
+          <div class="rating-display">
+            {% if package.hotel_star_rating %}
+            <div class="star-rating-pill">
+              {% for i in "12345" %}
+              <i class="fas fa-star {% if forloop.counter <= package.hotel_star_rating %}active{% endif %}"></i>
+              {% endfor %}
+              <span>{{ package.hotel_star_rating }} Star Experience</span>
+            </div>
+            {% else %}
+            <div class="star-rating-pill">
+              <i class="fas fa-concierge-bell active"></i>
+              <span>{{ package.get_accommodation_display }}</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="icon-circle">
+            <i class="fas fa-hotel"></i>
+          </div>
+        </div>
       </div>
 
-      <div class="weather-sidebar">
-        <div
-          style="background:white;border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow-sm);margin-bottom:1rem">
-          <h3
-            style="font-size:1.05rem;font-family:var(--font-body);font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
-            <i class="fas fa-cloud-sun" style="color:var(--teal)"></i> Current Weather
-          </h3>
-          <div id="weather-widget">
-            <div
-              style="background:var(--gray-50);border-radius:var(--radius-sm);padding:2rem;text-align:center;color:var(--gray-400);border:1px dashed var(--gray-200)">
-              <i class="fas fa-circle-notch fa-spin fa-2x" style="margin-bottom:.75rem"></i>
-              <p style="font-size:.85rem">Fetching local weather...</p>
+      <div class="card-details-grid">
+        <div class="details-main">
+          <div class="section-title">
+            <span class="line"></span>
+            <h4>The Stay Experience</h4>
+          </div>
+          <p>We believe your resting place is just as important as your destination. This property has been handpicked
+            for its exceptional service standards, cleanliness, and central location.</p>
+
+          <div class="feature-strip">
+            <div class="feature-item">
+              <i class="fas fa-map-marked-alt"></i>
+              <div>
+                <strong>Prime Location</strong>
+                <p>Heart of the city</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-bed"></i>
+              <div>
+                <strong>Premium Bedding</strong>
+                <p>300+ Thread count</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div
-          style="background:linear-gradient(135deg,var(--cream),#fff);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow-sm);border-left:4px solid var(--saffron)">
-          <h4 style="font-size:.85rem;font-weight:700;color:var(--navy);margin-bottom:.5rem">💡 Pro Travel Tip</h4>
-          <p style="font-size:.82rem;color:var(--gray-600);line-height:1.6">
-            The best time to experience <strong>{{ package.title }}</strong> is during <strong>{{
-              package.get_best_season_display }}</strong> when the weather is most favorable for sightseeing.
-          </p>
+        <div class="details-sidebar">
+          <div class="amenities-glass">
+            <h5>Key Amenities</h5>
+            <div class="amenity-list">
+              <div class="amenity-tag"><i class="fas fa-wifi"></i> Ultra Fast Wi-Fi</div>
+              <div class="amenity-tag"><i class="fas fa-utensils"></i> Chef's Breakfast</div>
+              <div class="amenity-tag"><i class="fas fa-snowflake"></i> Smart A/C</div>
+              <div class="amenity-tag"><i class="fas fa-shower"></i> Rainfall Shower</div>
+              <div class="amenity-tag"><i class="fas fa-shield-alt"></i> 24h Guarded</div>
+            </div>
+          </div>
+          <div class="verification-seal">
+            <i class="fas fa-check-circle"></i>
+            <span>Verified Quality by TourVista</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transportation -->
+  <div class="tab-panel" id="tab-transport">
+    <div class="elite-logistics-card">
+      <div class="logistics-header">
+        <div class="header-info">
+          <span class="label-tag">Travel Logistics</span>
+          <h3>Seamless Transfer Excellence</h3>
+          <p>{{ package.get_transportation_display }} & Private Transfers</p>
+        </div>
+        <div class="header-icon">
+          <i
+            class="fas {% if package.transportation == 'flight' %}fa-plane-departure{% elif package.transportation == 'train' %}fa-train-subway{% elif package.transportation == 'bus' %}fa-bus-alt{% else %}fa-car-side{% endif %}"></i>
+        </div>
+      </div>
+
+      <div class="logistics-content">
+        <div class="service-highlight-box">
+          <div class="box-inner">
+            <div class="status-indicator">
+              <span class="dot pulse"></span> Fully Optimized Route
+            </div>
+            <p class="description">{{ package.transport_details|default:"A dedicated premium vehicle with a professional
+              chauffeur will manage all your transfers, ensuring punctuality and safety throughout the journey." }}</p>
+
+            <div class="logistics-timeline">
+              <div class="timeline-step">
+                <i class="fas fa-door-open"></i>
+                <span>Pickup</span>
+              </div>
+              <div class="timeline-line"></div>
+              <div class="timeline-step">
+                <i class="fas fa-route"></i>
+                <span>Transfer</span>
+              </div>
+              <div class="timeline-line"></div>
+              <div class="timeline-step">
+                <i class="fas fa-map-marker-check"></i>
+                <span>Dropoff</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="guarantee-grid">
+          <div class="guarantee-card">
+            <i class="fas fa-user-shield"></i>
+            <span>Verified Chauffeur</span>
+          </div>
+          <div class="guarantee-card">
+            <i class="fas fa-spray-can-sparkles"></i>
+            <span>100% Sanitized</span>
+          </div>
+          <div class="guarantee-card">
+            <i class="fas fa-clock"></i>
+            <span>On-Time Arrival</span>
+          </div>
         </div>
       </div>
     </div>
@@ -309,31 +357,6 @@
     const city = "{{ package.city_name|escapejs }}";
 
     function initDelayedFeatures() {
-      // Weather initialization
-      if (city) {
-        let weatherRetries = 0;
-        function tryWeather() {
-          if (typeof loadWeather === 'function') {
-            loadWeather(city);
-          } else if (weatherRetries < 50) {
-            weatherRetries++;
-            setTimeout(tryWeather, 100);
-          }
-        }
-        tryWeather();
-      }
-
-      // Map Re-initialization for hidden tabs
-      const mapTabBtn = document.querySelector('.tab-btn[data-tab="tab-map"]');
-      if (mapTabBtn) {
-        mapTabBtn.addEventListener('click', function () {
-          setTimeout(() => {
-            if (typeof initIndiaMap === 'function') {
-              initIndiaMap();
-            }
-          }, 150);
-        }, { once: true });
-      }
       // 3. Rating Progress Bars (applied via JS to avoid IDE style validation errors)
       document.querySelectorAll('.rating-bar-fill').forEach(bar => {
         const percent = bar.getAttribute('data-percent');
@@ -484,6 +507,373 @@
 </script>
 
 <style>
+  /* ── PREMIUM STAY CARD ── */
+  .premium-stay-card {
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+  }
+
+  .premium-stay-card .card-hero {
+    padding: 2.5rem;
+    background: linear-gradient(135deg, var(--navy) 0%, #1A2E42 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .premium-stay-card .card-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255, 107, 53, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .badge-elite {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    padding: .4rem .9rem;
+    border-radius: 99px;
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    margin-bottom: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .premium-stay-card h2 {
+    color: white;
+    font-size: 2.25rem;
+    margin: 0 0 1rem;
+  }
+
+  .star-rating-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    background: white;
+    padding: .4rem 1rem;
+    border-radius: 99px;
+    color: var(--navy);
+    font-weight: 700;
+    font-size: .85rem;
+  }
+
+  .star-rating-pill i.active {
+    color: var(--saffron);
+  }
+
+  .icon-circle {
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: var(--saffron);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .card-details-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 3rem;
+    padding: 2.5rem;
+  }
+
+  .section-title {
+    margin-bottom: 1.5rem;
+  }
+
+  .section-title .line {
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: var(--saffron);
+    border-radius: 2px;
+    margin-bottom: .75rem;
+  }
+
+  .section-title h4 {
+    font-size: 1.25rem;
+    color: var(--navy);
+  }
+
+  .details-main p {
+    font-size: 1rem;
+    color: var(--gray-600);
+    line-height: 1.8;
+    margin-bottom: 2rem;
+  }
+
+  .feature-strip {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .feature-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .feature-item i {
+    font-size: 1.5rem;
+    color: var(--saffron);
+  }
+
+  .feature-item strong {
+    display: block;
+    font-size: .95rem;
+    color: var(--navy);
+  }
+
+  .feature-item p {
+    font-size: .8rem;
+    color: var(--gray-500);
+    margin: 0;
+  }
+
+  .amenities-glass {
+    background: var(--gray-50);
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 1px solid var(--gray-100);
+  }
+
+  .amenities-glass h5 {
+    font-size: .95rem;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 1.25rem;
+  }
+
+  .amenity-list {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+  }
+
+  .amenity-tag {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    font-size: .88rem;
+    color: var(--gray-600);
+    font-weight: 500;
+  }
+
+  .amenity-tag i {
+    width: 20px;
+    color: var(--teal);
+    text-align: center;
+  }
+
+  .verification-seal {
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    color: var(--success);
+    font-weight: 700;
+    font-size: .8rem;
+    background: rgba(16, 185, 129, 0.05);
+    padding: .75rem;
+    border-radius: 12px;
+  }
+
+  /* ── ELITE LOGISTICS CARD ── */
+  .elite-logistics-card {
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.06);
+  }
+
+  .logistics-header {
+    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+    padding: 2.5rem;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .label-tag {
+    font-size: .75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .15em;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .logistics-header h3 {
+    color: white;
+    font-size: 2rem;
+    margin: .5rem 0 .25rem;
+  }
+
+  .logistics-header p {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+  }
+
+  .header-icon {
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.2);
+  }
+
+  .logistics-content {
+    padding: 2.5rem;
+  }
+
+  .service-highlight-box {
+    background: var(--navy);
+    color: white;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    font-size: .85rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+  }
+
+  .status-indicator .dot {
+    width: 8px;
+    height: 8px;
+    background: #10B981;
+    border-radius: 50%;
+  }
+
+  .pulse {
+    animation: pulse-status 2s infinite;
+  }
+
+  @keyframes pulse-status {
+    0% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+
+    70% {
+      box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+
+    100% {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+  }
+
+  .service-highlight-box .description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+  }
+
+  .logistics-timeline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    padding: 0 1rem;
+  }
+
+  .timeline-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .75rem;
+    z-index: 2;
+  }
+
+  .timeline-step i {
+    width: 44px;
+    height: 44px;
+    background: white;
+    color: var(--navy);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .timeline-step span {
+    font-size: .7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    opacity: 0.7;
+  }
+
+  .timeline-line {
+    flex: 1;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 0 -10px;
+    margin-top: -18px;
+  }
+
+  .guarantee-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .guarantee-card {
+    background: var(--gray-50);
+    padding: 1.5rem;
+    border-radius: 16px;
+    text-align: center;
+    border: 1px solid var(--gray-100);
+    transition: var(--transition);
+  }
+
+  .guarantee-card:hover {
+    transform: translateY(-5px);
+    background: white;
+    box-shadow: var(--shadow-md);
+    border-color: var(--teal);
+  }
+
+  .guarantee-card i {
+    display: block;
+    font-size: 1.5rem;
+    color: var(--teal);
+    margin-bottom: .75rem;
+  }
+
+  .guarantee-card span {
+    font-size: .85rem;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
   .star-rating input {
     display: none;
   }

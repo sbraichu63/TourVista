@@ -300,4 +300,42 @@ INDIA_DESTINATIONS = [
 ]
 
 def destinations_map(request):
-    return JsonResponse({"destinations": INDIA_DESTINATIONS})
+    from core.models import Destination, TourPackage
+    
+    dest_list = Destination.objects.all()
+    
+    if not dest_list.exists():
+        # Fallback to hardcoded if DB is empty (for dev)
+        return JsonResponse({"destinations": INDIA_DESTINATIONS})
+
+    data = []
+    for d in dest_list:
+        if d.latitude and d.longitude:
+            # Count active packages for this destination
+            pkg_count = TourPackage.objects.filter(destination=d, is_active=True).count()
+            
+            # Fix for missing image
+            image_url = d.image.url if d.image else "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=600&q=80"
+            
+            # Fix for description
+            desc = d.description[:100] + "..." if d.description else "Discover the beauty and culture of " + d.name + "."
+            
+            # Fix for state display (if code is used)
+            state_display = d.get_state_display()
+            if len(state_display) <= 3: # Likely a code like 'MH'
+                state_map = {'MH': 'Maharashtra', 'RJ': 'Rajasthan', 'GA': 'Goa', 'KL': 'Kerala', 'HP': 'Himachal Pradesh'}
+                state_display = state_map.get(state_display, state_display)
+
+            data.append({
+                "id": d.id,
+                "name": d.name,
+                "lat": float(d.latitude),
+                "lng": float(d.longitude),
+                "state": state_display,
+                "type": d.category,
+                "image": image_url,
+                "pkg_count": pkg_count,
+                "description": desc
+            })
+            
+    return JsonResponse({"destinations": data})

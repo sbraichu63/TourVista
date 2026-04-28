@@ -1,96 +1,616 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Explore India Map{% endblock %}
+{% block title %}Explore India Interactively | TourVista{% endblock %}
 
 {% block content %}
-<div class="page-hero">
-  <div class="container">
-    <h1>Explore India Interactively</h1>
-    <p>Click on any destination pin to discover tour packages, weather, and travel guides.</p>
-  </div>
-</div>
-<section class="section section-sm">
-  <div class="container">
-    <div style="display:grid;grid-template-columns:1fr 320px;gap:2rem">
-      <div>
-        <div id="india-map"></div>
-        <div style="margin-top:.75rem;font-size:.8rem;color:var(--gray-500);text-align:center">
-          <i class="fas fa-info-circle"></i> Map powered by OpenStreetMap · Click pins to explore destinations
-        </div>
-      </div>
-      <div>
-        <div style="background:white;border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow)">
-          <h3 style="font-family:var(--font-body);font-size:1rem;font-weight:700;margin-bottom:1rem">
-            <i class="fas fa-map-pin" style="color:var(--saffron)"></i> Quick Destinations
-          </h3>
-          <div style="display:flex;flex-direction:column;gap:.4rem" id="dest-list">
-            <div style="padding:.6rem;background:var(--gray-50);border-radius:var(--radius-sm);font-size:.82rem;color:var(--gray-400);text-align:center">Loading destinations...</div>
-          </div>
-        </div>
-
-        <div style="background:white;border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow);margin-top:1rem">
-          <h3 style="font-family:var(--font-body);font-size:1rem;font-weight:700;margin-bottom:1rem">
-            <i class="fas fa-crosshairs" style="color:var(--teal)"></i> My Location
-          </h3>
-          <button class="btn btn-teal w-100" style="justify-content:center" onclick="getUserLocation()">
-            <i class="fas fa-location-arrow"></i> Find My Location
-          </button>
-          <div id="location-info" style="margin-top:.75rem;font-size:.82rem;color:var(--gray-500);text-align:center"></div>
-        </div>
-      </div>
+<div class="map-page-wrapper">
+  <!-- Left Side: Interactive Map -->
+  <div class="map-container">
+    <div id="india-map"></div>
+    <div class="map-overlay-controls">
+      <button class="map-control-btn" title="My Location" onclick="getUserLocation()">
+        <i class="fas fa-location-arrow"></i>
+      </button>
+      <button class="map-control-btn" title="Reset View" onclick="resetMapView()">
+        <i class="fas fa-home"></i>
+      </button>
+    </div>
+    <div class="map-attribution">
+      <i class="fas fa-info-circle"></i> Click markers to view tours and live weather.
     </div>
   </div>
-</section>
+
+  <!-- Right Side: Sidebar -->
+  <aside class="map-sidebar">
+    <div class="sidebar-header">
+      <h2>Explore India</h2>
+      <p>Discover your next adventure on the map.</p>
+      
+      <div class="search-box-wrapper mt-3">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="map-search" placeholder="Search destinations..." oninput="filterDestinations()">
+      </div>
+      
+      <div class="category-chips mt-3">
+        <button class="chip active" data-category="all" onclick="filterByCategory('all')">All</button>
+        <button class="chip" data-category="Heritage" onclick="filterByCategory('Heritage')">Heritage</button>
+        <button class="chip" data-category="Beach" onclick="filterByCategory('Beach')">Beach</button>
+        <button class="chip" data-category="Hills" onclick="filterByCategory('Hills')">Hills</button>
+        <button class="chip" data-category="Adventure" onclick="filterByCategory('Adventure')">Adventure</button>
+      </div>
+    </div>
+
+    <div class="dest-list-wrapper" id="dest-list">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <span>Loading destinations...</span>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="location-status" id="location-info">
+        <i class="fas fa-map-marker-alt"></i> India, South Asia
+      </div>
+    </div>
+  </aside>
+</div>
+
+<style>
+  :root {
+    --sidebar-width: 380px;
+  }
+
+  .map-page-wrapper {
+    display: flex;
+    height: calc(100vh - var(--navbar-height));
+    margin-top: var(--navbar-height);
+    overflow: hidden;
+  }
+
+  /* Map Container */
+  .map-container {
+    flex: 1;
+    position: relative;
+    background: #f0f0f0;
+  }
+
+  #india-map {
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+  }
+
+  .map-overlay-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .map-control-btn {
+    width: 44px;
+    height: 44px;
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-md);
+    color: var(--navy);
+    transition: var(--transition-fast);
+    font-size: 1.1rem;
+    border: 1px solid var(--gray-100);
+  }
+
+  .map-control-btn:hover {
+    color: var(--saffron);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .map-attribution {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 100;
+    background: rgba(255,255,255,0.9);
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 0.72rem;
+    color: var(--gray-500);
+    box-shadow: var(--shadow-sm);
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+  }
+
+  /* Sidebar */
+  .map-sidebar {
+    width: var(--sidebar-width);
+    background: white;
+    border-left: 1px solid var(--gray-200);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+  }
+
+  .sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  .sidebar-header h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .sidebar-header p {
+    font-size: 0.88rem;
+    color: var(--gray-500);
+  }
+
+  .search-box-wrapper {
+    position: relative;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+    font-size: 0.9rem;
+  }
+
+  #map-search {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    border: 1.5px solid var(--gray-100);
+    border-radius: 12px;
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    transition: var(--transition-fast);
+    background: var(--gray-50);
+  }
+
+  #map-search:focus {
+    outline: none;
+    border-color: var(--saffron);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(255,107,53,0.1);
+  }
+
+  .category-chips {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+    scrollbar-width: none;
+  }
+
+  .category-chips::-webkit-scrollbar { display: none; }
+
+  .chip {
+    padding: 6px 16px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 99px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    white-space: nowrap;
+    transition: var(--transition-fast);
+  }
+
+  .chip:hover {
+    border-color: var(--saffron);
+    color: var(--saffron);
+  }
+
+  .chip.active {
+    background: var(--saffron);
+    color: white;
+    border-color: var(--saffron);
+  }
+
+  /* Destination List */
+  .dest-list-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .dest-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 16px;
+    border: 1.5px solid transparent;
+    transition: var(--transition-fast);
+    cursor: pointer;
+    background: white;
+  }
+
+  .dest-item:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-200);
+    transform: translateX(4px);
+  }
+
+  .dest-item.active {
+    background: rgba(255,107,53,0.05);
+    border-color: var(--saffron);
+  }
+
+  .dest-item-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: var(--gray-100);
+  }
+
+  .dest-item-content {
+    flex: 1;
+  }
+
+  .dest-item-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 2px;
+  }
+
+  .dest-item-state {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .dest-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .dest-badge {
+    padding: 2px 8px;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    border-radius: 4px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .pkg-count {
+    font-size: 0.72rem;
+    color: var(--teal);
+    font-weight: 600;
+  }
+
+  .sidebar-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--gray-100);
+    background: var(--gray-50);
+  }
+
+  .location-status {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Custom Popup */
+  .leaflet-popup-content-wrapper {
+    border-radius: 20px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+  }
+
+  .leaflet-popup-content {
+    margin: 0 !important;
+    width: 230px !important;
+  }
+
+  .popup-card {
+    position: relative;
+  }
+
+  .popup-img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    background: #f3f4f6;
+    display: block;
+  }
+
+  .popup-body {
+    padding: 15px;
+  }
+
+  .popup-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--navy);
+  }
+
+  .popup-weather {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--gray-100);
+  }
+
+  .popup-temp {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--saffron);
+  }
+
+  /* Loading Spinner */
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    gap: 15px;
+    color: var(--gray-400);
+  }
+
+  .spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid var(--gray-200);
+    border-top-color: var(--saffron);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 992px) {
+    .map-page-wrapper { flex-direction: column; height: auto; }
+    .map-sidebar { width: 100%; height: 500px; border-left: none; border-top: 1px solid var(--gray-200); }
+    .map-container { height: 400px; }
+  }
+</style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-async function populateDestList() {
-  try {
-    const resp = await fetch('/api/destinations/');
-    const { destinations } = await resp.json();
-    const list = document.getElementById('dest-list');
-    list.innerHTML = destinations.map(d => `
-      <div onclick="flyTo(${d.lat},${d.lng},'${d.name}')" style="padding:.6rem .75rem;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;display:flex;justify-content:space-between;align-items:center;font-size:.85rem"
-        onmouseover="this.style.background='#FFF3E0'" onmouseout="this.style.background='transparent'">
-        <span style="font-weight:600;color:var(--navy)">${d.name}</span>
-        <span style="font-size:.72rem;background:var(--gray-100);padding:.15rem .5rem;border-radius:999px;color:var(--gray-500)">${d.type}</span>
-      </div>`).join('');
-  } catch(e) {}
+let leafletMap;
+let allDestinations = [];
+let markers = {};
+
+// Initial Map Load
+async function initIndiaMap() {
+  const mapEl = document.getElementById('india-map');
+  if (!mapEl || leafletMap) return;
+
+  // Wait for Leaflet to be ready
+  if (typeof L === 'undefined') {
+    setTimeout(initIndiaMap, 100);
+    return;
+  }
+
+  // Small timeout to ensure container is fully rendered before map init
+  setTimeout(() => {
+    leafletMap = L.map('india-map', {
+      center: [21.0, 78.0],
+      zoom: 5,
+      minZoom: 4,
+      maxBounds: [[6.0, 68.0], [38.0, 98.0]],
+      zoomControl: false,
+    });
+
+    L.control.zoom({ position: 'bottomright' }).addTo(leafletMap);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '© OpenStreetMap contributors © CARTO',
+      maxZoom: 18,
+    }).addTo(leafletMap);
+
+    loadDestinations();
+  }, 100);
 }
 
-let leafletMap;
-function flyTo(lat, lng, name) {
-  if(leafletMap) { leafletMap.flyTo([lat, lng], 9, {duration:1.5}); }
+async function loadDestinations() {
+  const listContainer = document.getElementById('dest-list');
+  try {
+    const resp = await fetch('/api/destinations/');
+    const data = await resp.json();
+    allDestinations = data.destinations;
+    renderDestList(allDestinations);
+    addMarkers(allDestinations);
+  } catch (e) {
+    listContainer.innerHTML = '<div class="text-center p-4">Failed to load destinations.</div>';
+  }
+}
+
+function renderDestList(destinations) {
+  const container = document.getElementById('dest-list');
+  if (destinations.length === 0) {
+    container.innerHTML = '<div class="text-center p-4 text-muted">No destinations found matching your search.</div>';
+    return;
+  }
+
+  container.innerHTML = destinations.map(d => `
+    <div class="dest-item" id="dest-item-${d.id || d.name.replace(/\s/g,'')}" onclick="focusDestination(${d.lat}, ${d.lng}, '${d.id || d.name}')">
+      <img src="${d.image}" class="dest-item-img" alt="${d.name}">
+      <div class="dest-item-content">
+        <div class="dest-item-name">${d.name}</div>
+        <div class="dest-item-state"><i class="fas fa-map-marker-alt" style="font-size:0.7rem"></i> ${d.state}</div>
+        <div class="dest-item-meta">
+          <span class="dest-badge">${d.type}</span>
+          ${d.pkg_count > 0 ? `<span class="pkg-count">${d.pkg_count} Tours</span>` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addMarkers(destinations) {
+  // Clear existing
+  for (let key in markers) {
+    leafletMap.removeLayer(markers[key]);
+  }
+  markers = {};
+
+  const customIcon = L.divIcon({
+    className: 'custom-marker',
+    html: `<div style="width:24px;height:24px;background:var(--saffron);border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 4px 10px rgba(0,0,0,0.2)"></div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 24],
+    popupAnchor: [0, -25]
+  });
+
+  destinations.forEach(d => {
+    const marker = L.marker([d.lat, d.lng], { icon: customIcon }).addTo(leafletMap);
+    
+    // Create rich popup
+    const popupContent = `
+      <div class="popup-card">
+        <img src="${d.image}" class="popup-img">
+        <div class="popup-body">
+          <div class="popup-title">${d.name}</div>
+          <div style="font-size:0.75rem; color:var(--gray-500); margin-bottom:8px">${d.state} · ${d.type}</div>
+          <p style="font-size:0.8rem; color:var(--gray-600); margin-bottom:12px">${d.description || ''}</p>
+          <div class="popup-weather" id="popup-weather-${d.id || d.name.replace(/\s/g,'')}">
+            <div class="spinner-border spinner-border-sm text-warning" role="status" style="width:1rem;height:1rem"></div>
+            <span style="font-size:0.75rem;color:var(--gray-400)">Loading weather...</span>
+          </div>
+          <a href="/packages/?q=${d.name}" class="btn btn-primary btn-sm w-100 mt-2" style="justify-content:center">View Tour Packages</a>
+        </div>
+      </div>
+    `;
+
+    marker.bindPopup(popupContent, {
+      maxWidth: 230,
+      autoPan: true,
+      autoPanPadding: L.point(40, 160), // Extra space for navbar
+      keepInView: true
+    });
+    
+    marker.on('popupopen', () => {
+      fetchWeather(d.name, `popup-weather-${d.id || d.name.replace(/\s/g,'')}`);
+      highlightListItem(d.id || d.name);
+    });
+
+    markers[d.id || d.name] = marker;
+  });
+}
+
+async function fetchWeather(city, elementId) {
+  try {
+    const resp = await fetch(`/api/weather/?city=${encodeURIComponent(city)}`);
+    const data = await resp.json();
+    const el = document.getElementById(elementId);
+    if (!el || data.error) return;
+
+    el.innerHTML = `
+      <img src="https://openweathermap.org/img/wn/${data.icon}.png" width="30" alt="">
+      <div class="popup-temp">${data.temp}°C</div>
+      <div style="font-size:0.75rem;color:var(--gray-500);line-height:1.2">
+        <b>${data.description}</b><br>
+        Humidity: ${data.humidity}%
+      </div>
+    `;
+  } catch (e) {}
+}
+
+function focusDestination(lat, lng, id) {
+  leafletMap.flyTo([lat, lng], 10, { duration: 1.5 });
+  if (markers[id]) {
+    markers[id].openPopup();
+  }
+}
+
+function highlightListItem(id) {
+  document.querySelectorAll('.dest-item').forEach(el => el.classList.remove('active'));
+  const item = document.getElementById(`dest-item-${id.toString().replace(/\s/g,'')}`);
+  if (item) {
+    item.classList.add('active');
+    item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function filterDestinations() {
+  const query = document.getElementById('map-search').value.toLowerCase();
+  const filtered = allDestinations.filter(d => 
+    d.name.toLowerCase().includes(query) || 
+    d.state.toLowerCase().includes(query) ||
+    d.type.toLowerCase().includes(query)
+  );
+  renderDestList(filtered);
+  addMarkers(filtered); // Update map markers as well
+}
+
+function filterByCategory(cat) {
+  // Update UI
+  const chips = document.querySelectorAll('.chip');
+  chips.forEach(el => el.classList.remove('active'));
+  
+  // Find the clicked chip and make it active
+  const clickedChip = Array.from(chips).find(c => c.getAttribute('data-category') === cat);
+  if (clickedChip) clickedChip.classList.add('active');
+
+  const filtered = cat === 'all' 
+    ? allDestinations 
+    : allDestinations.filter(d => d.type.toLowerCase() === cat.toLowerCase());
+  
+  renderDestList(filtered);
+  addMarkers(filtered); // IMPORTANT: Update markers on the map too!
+}
+
+function resetMapView() {
+  leafletMap.flyTo([22.5, 78.9629], 5);
 }
 
 function getUserLocation() {
   const info = document.getElementById('location-info');
-  info.textContent = 'Detecting...';
-  if(!navigator.geolocation) { info.textContent = 'Geolocation not supported.'; return; }
+  info.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting your location...';
+  
+  if(!navigator.geolocation) {
+    info.textContent = 'Geolocation not supported.';
+    return;
+  }
+
   navigator.geolocation.getCurrentPosition(pos => {
     const { latitude, longitude } = pos.coords;
-    info.textContent = `📍 Lat: ${latitude.toFixed(3)}, Lon: ${longitude.toFixed(3)}`;
-    if(leafletMap) {
-      leafletMap.flyTo([latitude, longitude], 10);
-      L.marker([latitude, longitude]).addTo(leafletMap)
-        .bindPopup('<b>You are here!</b>').openPopup();
-    }
-  }, () => { info.textContent = 'Could not detect location.'; });
+    info.innerHTML = `<i class="fas fa-map-marker-alt"></i> Your Location: ${latitude.toFixed(2)}, ${longitude.toFixed(2)}`;
+    leafletMap.flyTo([latitude, longitude], 12);
+    
+    L.marker([latitude, longitude], {
+      icon: L.divIcon({
+        className: 'user-marker',
+        html: '<div style="width:16px;height:16px;background:#3B82F6;border:3px solid white;border-radius:50%;box-shadow:0 0 15px rgba(59,130,246,0.5)"></div>'
+      })
+    }).addTo(leafletMap).bindPopup('<b>You are here!</b>').openPopup();
+    
+  }, () => {
+    info.innerHTML = '<i class="fas fa-exclamation-circle"></i> Location access denied.';
+  });
 }
 
-// Override initIndiaMap to capture map reference
-const _origInit = window.initIndiaMap;
-window.initIndiaMap = async function() {
-  await _origInit?.();
-  leafletMap = window._leafletMapRef;
-  populateDestList();
-};
-
-// Patch to store ref
-const origFetch = fetch;
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => { populateDestList(); }, 1500);
-});
+// Start
+// Function is called by main.js automatically if india-map exists
 </script>
 {% endblock %}

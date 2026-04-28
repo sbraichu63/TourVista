@@ -65,7 +65,17 @@ class Destination(models.Model):
     name = models.CharField(max_length=100)
     state = models.CharField(max_length=50, choices=INDIAN_STATES)
     description = models.TextField()
+    category = models.CharField(max_length=50, default='Heritage', choices=[
+        ('Heritage', 'Heritage'),
+        ('Beach', 'Beach'),
+        ('Hills', 'Hills'),
+        ('Adventure', 'Adventure'),
+        ('Spiritual', 'Spiritual'),
+        ('Nature', 'Nature'),
+    ])
     image = models.ImageField(upload_to='destinations/', null=True, blank=True)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     is_featured = models.BooleanField(default=False)
 
     def __str__(self):

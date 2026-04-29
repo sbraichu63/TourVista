@@ -1,6 +1,9 @@
 from django.core.management.base import BaseCommand
 from core.models import TourPackage, Destination, Place
 from django.utils.text import slugify
+from django.conf import settings
+import os
+import shutil
 
 DESTINATIONS_DATA = [
     {"name": "Jaipur", "state": "rajasthan", "description": "The Pink City, capital of Rajasthan, known for stunning forts and palaces.", "is_featured": True, "lat": 26.9124, "lng": 75.7873},
@@ -608,8 +611,62 @@ PLACES_DATA = [
 class Command(BaseCommand):
     help = 'Seed the database with 25+ India tour packages and destinations'
 
+    def _sync_package_images(self):
+        """Helper to match existing images with slugified filenames to avoid 404s."""
+        media_packages_path = os.path.join(settings.MEDIA_ROOT, 'packages')
+        if not os.path.exists(media_packages_path):
+            return
+
+        files = os.listdir(media_packages_path)
+        self.stdout.write(self.style.MIGRATE_HEADING('--- Syncing package images ---'))
+
+        for p in PACKAGES_DATA:
+            title = p['title']
+            slug = slugify(title)
+            target_file = f"{slug}.jpg"
+            target_path = os.path.join(media_packages_path, target_file)
+
+            if os.path.exists(target_path):
+                continue
+
+            # Matching logic for common naming variations
+            possible_matches = [
+                title.replace(' ', '_').replace('&', '').replace('—', '').replace('-', '').replace('  ', ' ') + ".jpg",
+                title.replace(' ', '_').replace('&', '_').replace('—', '_').replace('-', '_').replace('__', '_') + ".jpg",
+                title.replace(' ', '_').replace('__', '_') + ".jpg",
+            ]
+            
+            keywords = title.lower().split()
+            found = False
+
+            # 1. Try exact/normalized underscore matches
+            for match in possible_matches:
+                for f in files:
+                    if f.lower() == match.lower() or f.lower().replace('__', '_') == match.lower().replace('__', '_'):
+                        source_path = os.path.join(media_packages_path, f)
+                        shutil.copy2(source_path, target_path)
+                        self.stdout.write(f'  [Fixed]: Found {f} -> {target_file}')
+                        found = True
+                        break
+                if found: break
+
+            # 2. Try prefix matches if still not found
+            if not found:
+                first_word = keywords[0]
+                for f in files:
+                    if f.lower().startswith(first_word) and f.lower().endswith('.jpg'):
+                        source_path = os.path.join(media_packages_path, f)
+                        shutil.copy2(source_path, target_path)
+                        self.stdout.write(f'  [Fixed-Alt]: Found {f} -> {target_file}')
+                        found = True
+                        break
+
     def handle(self, *args, **kwargs):
         self.stdout.write(self.style.MIGRATE_HEADING('--- Seeding TourVista India data ---'))
+        
+        # Sync images first to ensure they exist before database entries point to them
+        self._sync_package_images()
+
 
         # 1. Create specific destinations
         for d in DESTINATIONS_DATA:

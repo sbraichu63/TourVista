@@ -3,14 +3,16 @@ from core.models import TourPackage, Destination, Place
 from django.utils.text import slugify
 
 DESTINATIONS_DATA = [
-    {"name": "Jaipur", "state": "rajasthan", "description": "The Pink City, capital of Rajasthan, known for stunning forts and palaces.", "is_featured": True},
-    {"name": "Goa", "state": "goa", "description": "India's beach paradise with golden sands, Portuguese heritage, and vibrant nightlife.", "is_featured": True},
-    {"name": "Munnar", "state": "kerala", "description": "Misty hill station in Kerala surrounded by tea plantations and waterfalls.", "is_featured": True},
-    {"name": "Manali", "state": "himachal_pradesh", "description": "Adventure capital of India, nestled in the Himalayas with snow-capped peaks.", "is_featured": True},
-    {"name": "Srinagar", "state": "kashmir", "description": "The summer capital of J&K, famous for its Dal Lake and houseboats.", "is_featured": True},
-    {"name": "Rishikesh", "state": "uttarakhand", "description": "Yoga capital of the world and adventure hub on the banks of the Ganges.", "is_featured": True},
-    {"name": "Agra", "state": "uttar_pradesh", "description": "Home of the iconic Taj Mahal, one of the Seven Wonders of the World.", "is_featured": True},
-    {"name": "Andaman Islands", "state": "andaman", "description": "Crystal-clear waters, coral reefs, and pristine beaches in the Bay of Bengal.", "is_featured": True},
+    {"name": "Jaipur", "state": "rajasthan", "description": "The Pink City, capital of Rajasthan, known for stunning forts and palaces.", "is_featured": True, "lat": 26.9124, "lng": 75.7873},
+    {"name": "Goa", "state": "goa", "description": "India's beach paradise with golden sands, Portuguese heritage, and vibrant nightlife.", "is_featured": True, "lat": 15.2993, "lng": 74.1240},
+    {"name": "Munnar", "state": "kerala", "description": "Misty hill station in Kerala surrounded by tea plantations and waterfalls.", "is_featured": True, "lat": 10.0889, "lng": 77.0595},
+    {"name": "Manali", "state": "himachal_pradesh", "description": "Adventure capital of India, nestled in the Himalayas with snow-capped peaks.", "is_featured": True, "lat": 32.2396, "lng": 77.1887},
+    {"name": "Srinagar", "state": "kashmir", "description": "The summer capital of J&K, famous for its Dal Lake and houseboats.", "is_featured": True, "lat": 34.0837, "lng": 74.7973},
+    {"name": "Rishikesh", "state": "uttarakhand", "description": "Yoga capital of the world and adventure hub on the banks of the Ganges.", "is_featured": True, "lat": 30.0869, "lng": 78.2676},
+    {"name": "Agra", "state": "uttar_pradesh", "description": "Home of the iconic Taj Mahal, one of the Seven Wonders of the World.", "is_featured": True, "lat": 27.1767, "lng": 78.0081},
+    {"name": "Andaman Islands", "state": "andaman", "description": "Crystal-clear waters, coral reefs, and pristine beaches in the Bay of Bengal.", "is_featured": True, "lat": 11.7401, "lng": 92.6586},
+    {"name": "Puri", "state": "odisha", "description": "A coastal city in Odisha, home to the sacred Jagannath Temple and stunning Konark Sun Temple.", "is_featured": True, "lat": 19.8135, "lng": 85.8312},
+    {"name": "Hampi", "state": "karnataka", "description": "A UNESCO World Heritage site in Karnataka featuring ancient temple ruins and boulder-strewn landscapes.", "is_featured": True, "lat": 15.3350, "lng": 76.4600},
 ]
 
 PACKAGES_DATA = [
@@ -305,7 +307,7 @@ PACKAGES_DATA = [
     },
     {
         "title": "Konark & Puri — Eastern Spiritual Tour",
-        "state": "west_bengal",
+        "state": "odisha",
         "city_name": "Puri",
         "description": "Visit the world-famous Sun Temple at Konark and the sacred Jagannath Temple at Puri.",
         "highlights": "Konark Sun Temple\nJagannath Puri Temple\nChilika Lake\nPuri Beach Market\nRaghurajpur Village",
@@ -617,21 +619,29 @@ class Command(BaseCommand):
                     'state': d['state'],
                     'description': d['description'],
                     'is_featured': d['is_featured'],
+                    'latitude': d.get('lat'),
+                    'longitude': d.get('lng'),
                 }
             )
-            status = '[Created]' if created else '[Already exists]'
+            if not created:
+                obj.state = d['state']
+                obj.description = d['description']
+                obj.is_featured = d['is_featured']
+                obj.latitude = d.get('lat')
+                obj.longitude = d.get('lng')
+                obj.save()
+            status = '[Created]' if created else '[Updated]'
             self.stdout.write(f'  {status}: Destination {obj.name}')
 
         # 2. Ensure destinations exist for all package states
         all_states = set(p['state'] for p in PACKAGES_DATA)
         for state in all_states:
-            Destination.objects.get_or_create(
-                state=state,
-                defaults={
-                    'name': state.replace('_', ' ').title(),
-                    'description': f'Explore the beautiful state of {state.replace("_", " ").title()}.',
-                }
-            )
+            if not Destination.objects.filter(state=state).exists():
+                Destination.objects.create(
+                    state=state,
+                    name=state.replace('_', ' ').title(),
+                    description=f'Explore the beautiful state of {state.replace("_", " ").title()}.',
+                )
 
         self.stdout.write('')
 

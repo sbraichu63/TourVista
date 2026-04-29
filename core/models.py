@@ -16,6 +16,7 @@ INDIAN_STATES = [
     ('maharashtra', 'Maharashtra'),
     ('tamil_nadu', 'Tamil Nadu'),
     ('karnataka', 'Karnataka'),
+    ('odisha', 'Odisha'),
     ('west_bengal', 'West Bengal'),
     ('gujarat', 'Gujarat'),
     ('andaman', 'Andaman & Nicobar'),

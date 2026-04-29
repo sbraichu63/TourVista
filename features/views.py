@@ -212,6 +212,7 @@ BUDGET_DATA = {
     "tamil_nadu":      {"hotel": 2900, "food": 600, "transport": 1000, "activities": 500,  "flight": 6000},
     "karnataka":       {"hotel": 3200, "food": 800, "transport": 1100, "activities": 700,  "flight": 5500},
     "west_bengal":     {"hotel": 2700, "food": 700, "transport": 900,  "activities": 800,  "flight": 5800},
+    "odisha":          {"hotel": 2400, "food": 650, "transport": 1000, "activities": 600,  "flight": 5500},
     "gujarat":         {"hotel": 2500, "food": 750, "transport": 1200, "activities": 400,  "flight": 4800},
     "andaman":         {"hotel": 5000, "food": 1200, "transport": 2200, "activities": 1800, "flight": 11000},
     "uttar_pradesh":   {"hotel": 2400, "food": 600, "transport": 1100, "activities": 900,  "flight": 4000},

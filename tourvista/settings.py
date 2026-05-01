@@ -8,10 +8,24 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv(BASE_DIR / '.env')
+except ImportError:
+    pass  # python-dotenv not installed, use system environment variables
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 if not SECRET_KEY:
-    raise ValueError('SECRET_KEY environment variable not set. Set it in your .env or system environment.')
+    if os.environ.get('DEBUG', 'False') == 'True':
+        # Development: use a temporary key (auto-generated each restart)
+        import random
+        import string
+        SECRET_KEY = ''.join(random.choices(string.ascii_letters + string.digits, k=50))
+    else:
+        # Production: require SECRET_KEY to be set
+        raise ValueError('SECRET_KEY environment variable must be set for production. Set it in your .env file.')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'

@@ -5,7 +5,17 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 from django.http import FileResponse, HttpResponse, JsonResponse
+from django.views.decorators.http import require_http_methods
 import io
+import logging
+
+logger = logging.getLogger(__name__)
+
+# Discount tier constants
+GROUP_DISCOUNT_TIER_1 = 3
+GROUP_DISCOUNT_TIER_1_AMOUNT = 0.05
+GROUP_DISCOUNT_TIER_2 = 5
+GROUP_DISCOUNT_TIER_2_AMOUNT = 0.10
 
 from core.models import TourPackage
 from .models import Booking, Payment
@@ -117,8 +127,8 @@ Happy Travels! 🇮🇳
                     recipient_list=[booking.email],
                     fail_silently=True,
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning(f'Confirmation email failed for booking {booking.booking_ref}: {str(e)}')
 
             messages.success(request, f'🎉 Payment successful! Booking confirmed.')
             return redirect('bookings:receipt', booking_ref=booking_ref)
@@ -232,7 +242,8 @@ def download_receipt(request, booking_ref):
         buf.seek(0)
         return FileResponse(buf, as_attachment=True, filename=f'TourVista_Receipt_{booking.booking_ref}.pdf')
 
-    except ImportError:
+    except ImportError as e:
+        logger.error(f'ReportLab import failed: {str(e)}')
         return HttpResponse('PDF generation requires reportlab. Install it with: pip install reportlab', status=500)
 
 def calculate_price(request):
@@ -244,10 +255,10 @@ def calculate_price(request):
         price = package.discounted_price or 0
 
         discount = 0
-        if travellers >= 5:
-            discount = 0.10
-        elif travellers >= 3:
-            discount = 0.05
+        if travellers >= GROUP_DISCOUNT_TIER_2:
+            discount = GROUP_DISCOUNT_TIER_2_AMOUNT
+        elif travellers >= GROUP_DISCOUNT_TIER_1:
+            discount = GROUP_DISCOUNT_TIER_1_AMOUNT
 
         total = price * travellers
         discount_amount = total * discount

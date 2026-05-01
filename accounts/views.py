@@ -1,11 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
+import logging
+
+logger = logging.getLogger(__name__)
 
 from .forms import RegisterForm, LoginForm, ProfileUpdateForm
 from .models import UserProfile, EmailVerificationToken
@@ -59,8 +62,8 @@ Happy Travels!
                     recipient_list=[user.email],
                     fail_silently=False,
                 )
-            except Exception:
-                pass  # Don't block registration if email fails
+            except Exception as e:
+                logger.warning(f'Email verification failed for user {user.username}: {str(e)}')
 
             messages.success(request, f'🎉 Account created! Check your email ({user.email}) to verify.')
             login(request, user)
@@ -107,7 +110,8 @@ def resend_verification(request):
             recipient_list=[request.user.email],
         )
         messages.success(request, '📧 Verification email resent! Check your inbox.')
-    except Exception:
+    except Exception as e:
+        logger.warning(f'Email resend failed for user {request.user.username}: {str(e)}')
         messages.error(request, 'Could not send email. Please try again later.')
 
     return redirect('accounts:dashboard')
@@ -213,7 +217,10 @@ def admin_dashboard(request):
     from core.models import TourPackage
     all_packages = TourPackage.objects.all()
 
-    total_revenue = sum(b.total_amount for b in all_bookings if b.status == 'confirmed')
+    from django.db.models import Sum
+    total_revenue = Booking.objects.filter(
+        status='confirmed'
+    ).aggregate(total=Sum('total_amount'))['total'] or 0
     pending_bookings = all_bookings.filter(status='pending').count()
 
     context = {

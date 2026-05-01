@@ -1,4 +1,6 @@
 from django import forms
+from django.utils import timezone
+from datetime import timedelta
 from .models import Booking, Payment
 
 
@@ -32,11 +34,14 @@ class BookingForm(forms.ModelForm):
         return n
 
     def clean_travel_date(self):
-        from django.utils import timezone
-        import datetime
         date = self.cleaned_data['travel_date']
-        if date < (timezone.now().date() + datetime.timedelta(days=1)):
+        min_date = timezone.now().date() + timedelta(days=1)
+        max_date = timezone.now().date() + timedelta(days=730)  # 2 years max
+        
+        if date < min_date:
             raise forms.ValidationError('Travel date must be at least tomorrow.')
+        if date > max_date:
+            raise forms.ValidationError('Travel date cannot be more than 2 years in advance.')
         return date
 
 

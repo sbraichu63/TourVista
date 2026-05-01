@@ -1,10 +1,14 @@
 import json
 import requests
+import logging
+import datetime
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.conf import settings
 from django.db.models import Q
+
+logger = logging.getLogger(__name__)
 
 
 # ──────────────────────────────────────────────────────────────────
@@ -52,7 +56,6 @@ def weather_api(request):
         forecast = []
         if forecast_resp.status_code == 200:
             for item in forecast_data.get('list', [])[:5]:
-                import datetime
                 dt = datetime.datetime.fromtimestamp(item['dt'])
                 forecast.append({
                     "day": days[dt.weekday()],
@@ -74,6 +77,9 @@ def weather_api(request):
         })
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+    except requests.RequestException as e:
+        logger.error(f'Weather API request failed: {str(e)}')
+        return JsonResponse({"error": "Unable to fetch weather data"}, status=500)
 
 
 # ──────────────────────────────────────────────────────────────────
@@ -105,7 +111,8 @@ def chatbot_api(request):
     try:
         body = json.loads(request.body)
         user_message = body.get('message', '').lower().strip()
-    except Exception:
+    except json.JSONDecodeError as e:
+        logger.warning(f'Invalid JSON in chatbot request: {str(e)}')
         return JsonResponse({"error": "Invalid request"}, status=400)
 
     if not user_message:
@@ -132,8 +139,8 @@ def chatbot_api(request):
             )
             response = model.generate_content(f"{system_prompt}\n\nUser: {user_message}")
             return JsonResponse({"reply": response.text, "source": "gemini"})
-        except Exception:
-            pass  # Fall through to rule-based
+        except Exception as e:
+            logger.debug(f'Gemini API failed, using fallback: {str(e)}')
 
     # Rule-based fallback with Database Search
     from core.models import TourPackage
@@ -152,7 +159,7 @@ def chatbot_api(request):
             tours_data.append({
                 "title": pkg.title,
                 "price": f"{int(pkg.discounted_price):,}",
-                "image": pkg.image.url if pkg.image else "/static/img/placeholder.jpg",
+                "image": pkg.main_image.url if pkg.main_image else "/static/img/placeholder.jpg",
                 "url": pkg.get_absolute_url()
             })
             

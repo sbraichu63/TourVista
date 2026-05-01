@@ -9,10 +9,12 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-tourvista-india-2024-finalyear-ybssm*284mo^26_adytaaw1')
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    raise ValueError('SECRET_KEY environment variable not set. Set it in your .env or system environment.')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
@@ -138,10 +140,10 @@ EMAIL_HOST_USER = 'noreply@tourvista.in'
 
 # ─── API KEYS ─────────────────────────────────────────────────────────────────
 # Get free key from: https://openweathermap.org/api
-OPENWEATHERMAP_API_KEY = os.environ.get('OPENWEATHERMAP_API_KEY', 'YOUR_OWM_KEY_HERE')
+OPENWEATHERMAP_API_KEY = os.environ.get('OPENWEATHERMAP_API_KEY', None)
 
 # Get free key from: https://aistudio.google.com/
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', None)
 
 # ─── MESSAGES ─────────────────────────────────────────────────────────────────
 from django.contrib.messages import constants as messages

@@ -105,7 +105,6 @@ CHATBOT_KNOWLEDGE = {
     "default": "Hello! I'm TourVista's travel assistant. I can help you with:\n🏝️ Destination info (Goa, Rajasthan, Kerala, Kashmir…)\n💰 Budget planning\n📅 Best time to visit\n🎒 Packing tips\n🍛 Food recommendations\n📋 Booking & cancellation queries\n\nJust ask me anything about India travel!"
 }
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def chatbot_api(request):
     try:

@@ -435,7 +435,7 @@ async function initIndiaMap() {
 async function loadDestinations() {
   const listContainer = document.getElementById('dest-list');
   try {
-    const resp = await fetch('/api/destinations/');
+    const resp = await fetch('/features/destinations/');
     const data = await resp.json();
     allDestinations = data.destinations;
     renderDestList(allDestinations);
@@ -520,7 +520,7 @@ function addMarkers(destinations) {
 
 async function fetchWeather(city, elementId) {
   try {
-    const resp = await fetch(`/api/weather/?city=${encodeURIComponent(city)}`);
+    const resp = await fetch(`/features/weather/?city=${encodeURIComponent(city)}`);
     const data = await resp.json();
     const el = document.getElementById(elementId);
     if (!el || data.error) return;

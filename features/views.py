@@ -6,7 +6,9 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.conf import settings
-from django.db.models import Q
+from django.shortcuts import render
+from django.db.models import Q, Avg
+from core.models import TourPackage, Destination
 
 logger = logging.getLogger(__name__)
 
@@ -141,9 +143,6 @@ def chatbot_api(request):
         except Exception as e:
             logger.debug(f'Gemini API failed, using fallback: {str(e)}')
 
-    # Rule-based fallback with Database Search
-    from core.models import TourPackage
-    
     # Check for destination/package mentions
     matching_packages = TourPackage.objects.filter(
         Q(title__icontains=user_message) | 
@@ -307,8 +306,6 @@ INDIA_DESTINATIONS = [
 ]
 
 def destinations_map(request):
-    from core.models import Destination, TourPackage
-    
     dest_list = Destination.objects.all()
     
     if not dest_list.exists():
@@ -346,3 +343,115 @@ def destinations_map(request):
             })
             
     return JsonResponse({"destinations": data})
+
+
+# ──────────────────────────────────────────────────────────────────
+# TRAVEL STYLE QUIZ API
+# ──────────────────────────────────────────────────────────────────
+@require_http_methods(["POST"])
+def quiz_api(request):
+    try:
+        data = json.loads(request.body)
+        terrain = data.get('terrain') # hills, beach, heritage, nature, spiritual
+        duration = data.get('duration') # short, medium, long
+        pace = data.get('pace')       # easy, moderate, challenging
+        comfort = data.get('comfort') # budget, standard, luxury
+        budget = data.get('budget')   # low, mid, high
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid data"}, status=400)
+
+    # --- Step 1: Initial Filtering ---
+    packages = TourPackage.objects.filter(is_active=True)
+
+    # 1. Terrain (Essential)
+    if terrain:
+        packages = packages.filter(destination__category__iexact=terrain)
+
+    # 2. Duration
+    if duration == 'short':
+        packages = packages.filter(duration_days__lte=3)
+    elif duration == 'medium':
+        packages = packages.filter(duration_days__gt=3, duration_days__lte=6)
+    elif duration == 'long':
+        packages = packages.filter(duration_days__gt=6)
+
+    # 3. Pace
+    if pace:
+        packages = packages.filter(difficulty__iexact=pace)
+
+    # 4. Comfort
+    if comfort == 'luxury':
+        packages = packages.filter(accommodation__in=['luxury_hotel', 'resort'])
+    elif comfort == 'budget':
+        packages = packages.filter(accommodation__in=['hostel', 'camp', 'homestay'])
+
+    # 5. Budget
+    if budget == 'low':
+        packages = packages.filter(price_per_person__lt=15000)
+    elif budget == 'mid':
+        packages = packages.filter(price_per_person__gte=15000, price_per_person__lte=40000)
+    elif budget == 'high':
+        packages = packages.filter(price_per_person__gt=40000)
+
+    # --- Step 2: Intelligent Recommendation Engine ---
+    is_perfect = True
+    recommendations = packages.annotate(rating=Avg('reviews__rating')).order_by('-is_featured', '-rating')
+
+    # If no results for the FULL filter, try relaxing non-essential ones (Duration, Pace)
+    if not recommendations.exists():
+        is_perfect = False
+        packages_f1 = TourPackage.objects.filter(is_active=True, destination__category__iexact=terrain)
+        
+        # Try keeping Budget or Comfort if possible
+        f1_results = packages_f1.filter(Q(price_per_person__lt=20000) if budget == 'low' else Q())
+        if f1_results.exists():
+            recommendations = f1_results.annotate(rating=Avg('reviews__rating')).order_by('-is_featured', '-rating')
+        else:
+            recommendations = packages_f1.annotate(rating=Avg('reviews__rating')).order_by('-is_featured', '-rating')
+
+    # If still no results (Landscape itself has no packages), show Featured ones
+    if not recommendations.exists():
+        is_perfect = False
+        recommendations = TourPackage.objects.filter(is_active=True).annotate(rating=Avg('reviews__rating')).order_by('-is_featured', '-rating')
+
+    recommendations = recommendations[:3]
+    
+    # --- Step 3: Global Suggestions (Diverse popular options) ---
+    match_ids = [pkg.id for pkg in recommendations]
+    suggestions_qs = TourPackage.objects.filter(is_active=True).exclude(id__in=match_ids).annotate(rating=Avg('reviews__rating')).order_by('-is_featured', '-rating')[:3]
+
+    results = []
+    for pkg in recommendations:
+        results.append({
+            "id": pkg.id,
+            "title": pkg.title,
+            "price": f"{int(pkg.discounted_price):,}",
+            "image": pkg.main_image.url if pkg.main_image else "/static/img/placeholder.jpg",
+            "url": pkg.get_absolute_url(),
+            "duration": f"{pkg.duration_days} Days",
+            "state": pkg.get_state_display()
+        })
+
+    suggestions = []
+    for pkg in suggestions_qs:
+        suggestions.append({
+            "id": pkg.id,
+            "title": pkg.title,
+            "price": f"{int(pkg.discounted_price):,}",
+            "image": pkg.main_image.url if pkg.main_image else "/static/img/placeholder.jpg",
+            "url": pkg.get_absolute_url(),
+            "duration": f"{pkg.duration_days} Days",
+            "state": pkg.get_state_display()
+        })
+
+    return JsonResponse({
+        "packages": results,
+        "suggestions": suggestions,
+        "is_perfect": is_perfect,
+        "count": len(results)
+    })
+
+
+def quiz_page(request):
+    """Renders the quiz interface."""
+    return render(request, 'features/quiz.html')

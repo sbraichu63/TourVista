@@ -54,6 +54,7 @@
         <a href="{% url 'core:home' %}" {% if request.resolver_match.url_name == 'home' %}class="active" {% endif %}>Home</a>
         <a href="{% url 'core:packages' %}" {% if 'package' in request.resolver_match.url_name %}class="active" {% endif %}>Packages</a>
         <a href="{% url 'core:explore_map' %}">Explore Map</a>
+        <a href="{% url 'features:quiz' %}" {% if request.resolver_match.url_name == 'quiz' %}class="active" {% endif %}>Style Quiz</a>
         <a href="{% url 'core:seasons' %}">Seasons</a>
         <a href="{% url 'core:about' %}">About</a>
       </div>
@@ -101,6 +102,7 @@
     <a href="{% url 'core:home' %}"><i class="fas fa-home" style="width:20px"></i> Home</a>
     <a href="{% url 'core:packages' %}"><i class="fas fa-suitcase" style="width:20px"></i> Packages</a>
     <a href="{% url 'core:explore_map' %}"><i class="fas fa-map" style="width:20px"></i> Explore Map</a>
+    <a href="{% url 'features:quiz' %}" style="color:var(--saffron); font-weight:700"><i class="fas fa-magic" style="width:20px"></i> Style Quiz ✨</a>
     <a href="{% url 'core:seasons' %}"><i class="fas fa-cloud-sun" style="width:20px"></i> Seasons</a>
     <a href="{% url 'core:about' %}"><i class="fas fa-info-circle" style="width:20px"></i> About</a>
     <div class="mobile-divider"></div>
@@ -148,6 +150,7 @@
             <li><a href="{% url 'core:home' %}">Home</a></li>
             <li><a href="{% url 'core:packages' %}">All Packages</a></li>
             <li><a href="{% url 'core:explore_map' %}">Explore Map</a></li>
+            <li><a href="{% url 'features:quiz' %}">Travel Style Quiz ✨</a></li>
             <li><a href="{% url 'core:seasons' %}">Travel Seasons</a></li>
             <li><a href="{% url 'core:about' %}">About Us</a></li>
           </ul>

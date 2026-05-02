@@ -113,6 +113,53 @@
     .budget-planner-card { grid-template-columns: 1fr; gap: 2rem; }
     .budget-inputs { padding-right: 0; border-right: none; border-bottom: 1px solid var(--gray-100); padding-bottom: 2rem; }
   }
+
+  .hero-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    font-size: 0.95rem;
+  }
+  .hero-discovery-link {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: 0.3s;
+    font-weight: 500;
+  }
+  .hero-discovery-link i {
+    color: var(--saffron);
+  }
+  .hero-discovery-link:hover {
+    color: white;
+    transform: translateY(-2px);
+  }
+  .hero-discovery-link strong {
+    color: var(--saffron);
+    text-decoration: underline;
+  }
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    min-height: calc(100vh - 80px);
+  }
+  .hero-search {
+    margin: 0 auto;
+    max-width: 800px;
+  }
+  .hero-badge {
+    margin: 0 auto 1.5rem;
+  }
+  .hero-stats {
+    justify-content: center;
+    width: 100%;
+  }
 </style>
 {% endblock %}
 
@@ -122,7 +169,7 @@
 <section class="hero">
 
   <div class="container hero-content">
-    <div style="max-width:700px;" data-aos="fade-up">
+    <div style="max-width:900px; width: 100%;" data-aos="fade-up">
 
       <div class="hero-badge">
         <span class="dot pulse"></span>
@@ -134,38 +181,36 @@
         <span class="highlight">Incredible India</span>
       </h1>
 
-      <p style="font-size:1.15rem;margin-bottom:2.5rem;opacity:.95">
-        From Kashmir to Goa — explore India with curated packages and unforgettable experiences.
-      </p>
-
-      <div class="hero-actions">
-        <a href="{% url 'core:packages' %}" class="btn btn-primary btn-lg">
-          <i class="fas fa-suitcase-rolling"></i> Explore Packages
-        </a>
-        <a href="{% url 'core:explore_map' %}" class="btn btn-white btn-lg">
-          <i class="fas fa-map-marked-alt"></i> Discover on Map
-        </a>
-      </div>
-
-      <!-- SEARCH -->
-      <div class="hero-search" data-aos="fade-up" data-aos-delay="200">
+      <!-- SEARCH BAR (Primary CTA) -->
+      <div class="hero-search" data-aos="fade-up" data-aos-delay="200" style="margin-bottom: 0;">
         <div style="display:flex;align-items:center;flex:1;padding-left:1rem">
           <i class="fas fa-search" style="color:#9CA3AF;font-size:.9rem"></i>
-          <input type="text" id="hero-search-input" placeholder="Where to go?">
+          <input type="text" id="hero-search-input" placeholder="Where would you like to go?">
         </div>
 
         <div class="search-divider"></div>
 
         <select id="hero-state-filter">
-          <option value="">All States</option>
+          <option value="">All Regions</option>
           {% for val, label in states %}
             <option value="{{ val }}">{{ label }}</option>
           {% endfor %}
         </select>
 
         <button class="btn btn-primary btn-sm" id="hero-search-btn">
-          Search
+          Search Packages
         </button>
+      </div>
+
+      <!-- SECONDARY DISCOVERY -->
+      <div class="hero-actions" data-aos="fade-up" data-aos-delay="300">
+        <a href="{% url 'features:quiz' %}" class="hero-discovery-link">
+          <i class="fas fa-wand-magic-sparkles"></i> Don't know where to go? <strong>Take the Style Quiz</strong>
+        </a>
+        <div style="width:1px; height: 15px; background: rgba(255,255,255,0.2); align-self: center;"></div>
+        <a href="{% url 'core:explore_map' %}" class="hero-discovery-link">
+          <i class="fas fa-map-location-dot"></i> View Interactive Map
+        </a>
       </div>
     </div>
 
@@ -219,6 +264,9 @@
       <p>No destinations available</p>
       {% endfor %}
     </div>
+
+  </div>
+</section>
 
   </div>
 </section>

@@ -1,0 +1,408 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Travel Style Quiz | TourVista{% endblock %}
+
+{% block content %}
+<div class="quiz-outer-container">
+    <div class="container">
+        <!-- Quiz Main Card -->
+        <div class="quiz-window" id="quiz-entry">
+            
+            <div class="quiz-progress-section">
+                <div class="progress-bar-container">
+                    <div id="quiz-pb" class="progress-bar-fill"></div>
+                </div>
+                <div class="progress-labels">
+                    <span class="step-indicator">Step <span id="step-num">1</span> of 5</span>
+                    <h1 id="quiz-question" class="question-text">Which landscape calls to you?</h1>
+                </div>
+            </div>
+
+            <form id="style-quiz-form">
+                {% csrf_token %}
+
+                <!-- STEP 1: LANDSCAPE (Emojis Only) -->
+                <div class="quiz-step active" data-step="1">
+                    <div class="selection-grid">
+                        <label class="choice-card emoji-only">
+                            <input type="radio" name="terrain" value="Hills" required>
+                            <div class="card-inner">
+                                <div class="card-icon">🏔️</div>
+                                <div class="card-label">Mountains & Peaks</div>
+                                <p class="card-subtext">Cool breeze and scenic heights</p>
+                            </div>
+                        </label>
+                        <label class="choice-card emoji-only">
+                            <input type="radio" name="terrain" value="Beach">
+                            <div class="card-inner">
+                                <div class="card-icon">🏖️</div>
+                                <div class="card-label">Sun & Beaches</div>
+                                <p class="card-subtext">Relaxing waves and coastal vibes</p>
+                            </div>
+                        </label>
+                        <label class="choice-card emoji-only">
+                            <input type="radio" name="terrain" value="Heritage">
+                            <div class="card-inner">
+                                <div class="card-icon">🏰</div>
+                                <div class="card-label">Culture & Heritage</div>
+                                <p class="card-subtext">Royal history and architecture</p>
+                            </div>
+                        </label>
+                        <label class="choice-card emoji-only">
+                            <input type="radio" name="terrain" value="Nature">
+                            <div class="card-inner">
+                                <div class="card-icon">🐯</div>
+                                <div class="card-label">Wildlife & Nature</div>
+                                <p class="card-subtext">National parks and forest trails</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- STEP 2: DURATION -->
+                <div class="quiz-step" data-step="2" style="display:none">
+                    <div class="selection-list">
+                        <label class="list-item">
+                            <input type="radio" name="duration" value="short">
+                            <div class="item-inner">
+                                <span class="item-icon">☕</span>
+                                <div class="item-content"><strong>A Quick Escape</strong><span>1 - 3 Days (Perfect for long weekends)</span></div>
+                            </div>
+                        </label>
+                        <label class="list-item">
+                            <input type="radio" name="duration" value="medium">
+                            <div class="item-inner">
+                                <span class="item-icon">🚗</span>
+                                <div class="item-content"><strong>Classic Discovery</strong><span>4 - 6 Days (Explore at a steady pace)</span></div>
+                            </div>
+                        </label>
+                        <label class="list-item">
+                            <input type="radio" name="duration" value="long">
+                            <div class="item-inner">
+                                <span class="item-icon">🏛️</span>
+                                <div class="item-content"><strong>The Grand Experience</strong><span>7+ Days (Complete immersion)</span></div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- STEP 3: PACE -->
+                <div class="quiz-step" data-step="3" style="display:none">
+                    <div class="selection-list">
+                        <label class="list-item">
+                            <input type="radio" name="pace" value="easy">
+                            <div class="item-inner">
+                                <span class="item-icon">🧘</span>
+                                <div class="item-content"><strong>Slow & Soulful</strong><span>Maximum relaxation and zero rush</span></div>
+                            </div>
+                        </label>
+                        <label class="list-item">
+                            <input type="radio" name="pace" value="moderate">
+                            <div class="item-inner">
+                                <span class="item-icon">🚶</span>
+                                <div class="item-content"><strong>Active & Engaging</strong><span>A balanced mix of sights and walks</span></div>
+                            </div>
+                        </label>
+                        <label class="list-item">
+                            <input type="radio" name="pace" value="challenging">
+                            <div class="item-inner">
+                                <span class="item-icon">🧗</span>
+                                <div class="item-content"><strong>High Intensity</strong><span>Adventure, trekking, and movement</span></div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- STEP 4: COMFORT -->
+                <div class="quiz-step" data-step="4" style="display:none">
+                    <div class="selection-grid small">
+                        <label class="choice-card small">
+                            <input type="radio" name="comfort" value="budget">
+                            <div class="card-inner">
+                                <div class="card-icon">🎒</div>
+                                <div class="card-label">Authentic & Raw</div>
+                                <p class="card-subtext">Camps & Hostels</p>
+                            </div>
+                        </label>
+                        <label class="choice-card small">
+                            <input type="radio" name="comfort" value="standard">
+                            <div class="card-inner">
+                                <div class="card-icon">🏨</div>
+                                <div class="card-label">Premium Comfort</div>
+                                <p class="card-subtext">3-4★ Boutique Hotels</p>
+                            </div>
+                        </label>
+                        <label class="choice-card small">
+                            <input type="radio" name="comfort" value="luxury">
+                            <div class="card-inner">
+                                <div class="card-icon">👑</div>
+                                <div class="card-label">Elite Luxury</div>
+                                <p class="card-subtext">5★ Resorts & Villas</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- STEP 5: BUDGET -->
+                <div class="quiz-step" data-step="5" style="display:none">
+                    <div class="selection-list">
+                        <label class="list-item">
+                            <input type="radio" name="budget" value="low">
+                            <div class="item-inner space">
+                                <div><strong>Wallet Friendly</strong><span>Under ₹15,000 per person</span></div>
+                                <span class="currency">₹</span>
+                            </div>
+                        </label>
+                        <label class="list-item">
+                            <input type="radio" name="budget" value="mid">
+                            <div class="item-inner space">
+                                <div><strong>Standard Range</strong><span>₹15,000 - ₹40,000 per person</span></div>
+                                <span class="currency">₹₹</span>
+                            </div>
+                        </label>
+                        <label class="list-item">
+                            <input type="radio" name="budget" value="high">
+                            <div class="item-inner space">
+                                <div><strong>Luxury Splurge</strong><span>Above ₹40,000 per person</span></div>
+                                <span class="currency">₹₹₹</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Footer Nav -->
+                <div class="quiz-nav">
+                    <button type="button" id="back-btn" class="btn-back" style="visibility:hidden">Previous</button>
+                    <button type="button" id="next-btn" class="btn-next">Continue <i class="fas fa-arrow-right"></i></button>
+                    <button type="submit" id="submit-btn" class="btn-submit" style="display:none">Find My Perfect Trips ✨</button>
+                </div>
+            </form>
+
+            <div id="quiz-loading" style="display:none; text-align:center; padding:3rem 0;">
+                <div class="custom-loader"></div>
+                <p style="margin-top:1.5rem; font-weight:700; color:var(--gray-500)">ANALYZING YOUR TRAVEL STYLE...</p>
+            </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="quiz-results" style="display:none; width:100%; margin-top: 2rem;">
+            <div class="results-header" style="text-align:center; margin-bottom:4rem;">
+                <h1 style="font-size:2.5rem; font-weight:800; color:var(--navy)">Your Travel Recommendations</h1>
+                <p style="color:var(--gray-500); font-size:1.1rem">We found these packages that perfectly suit your preferences.</p>
+            </div>
+
+            <div class="results-section">
+                <div class="section-label" id="match-label">🎯 PERFECT MATCHES</div>
+                <div id="matches-grid" class="packages-grid"></div>
+            </div>
+
+            <div class="results-section" id="suggestions-wrap">
+                <div class="section-label">💡 YOU MIGHT ALSO LIKE</div>
+                <div id="suggestions-grid" class="packages-grid suggestions"></div>
+            </div>
+
+            <div style="text-align:center; margin-top:5rem;">
+                <button onclick="window.location.reload()" class="btn-outline-navy">Restart Discovery Quiz</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    /* Reset & Clean Base */
+    .quiz-outer-container { padding: 4rem 0; background: #fdfdfd; min-height: 80vh; }
+    .quiz-window { background: white; max-width: 750px; margin: 0 auto; padding: 3.5rem; border-radius: 20px; box-shadow: 0 15px 50px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; }
+
+    /* Progress & Question */
+    .quiz-progress-section { margin-bottom: 3.5rem; }
+    .progress-bar-container { height: 6px; background: #f0f0f0; border-radius: 10px; margin-bottom: 1.5rem; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: var(--saffron); width: 20%; transition: 0.5s ease; }
+    .step-indicator { font-size: 0.8rem; font-weight: 800; color: var(--saffron); text-transform: uppercase; letter-spacing: 1px; }
+    .question-text { font-size: 2.2rem; font-weight: 800; color: var(--navy); margin-top: 0.5rem; line-height: 1.2; }
+
+    /* Selection Styles */
+    .selection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .selection-grid.small { grid-template-columns: 1fr 1fr 1fr; }
+    .choice-card input, .list-item input { display: none; }
+    
+    .choice-card .card-inner { border: 2px solid #f0f0f0; padding: 2rem 1.5rem; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.3s; height: 100%; }
+    .card-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .card-label { font-weight: 800; color: var(--navy); font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .card-subtext { font-size: 0.8rem; color: #777; margin: 0; }
+    
+    .choice-card:hover .card-inner { border-color: var(--saffron); transform: translateY(-5px); }
+    .choice-card input:checked + .card-inner { border-color: var(--saffron); background: #fffcf9; border-width: 3px; box-shadow: 0 10px 20px rgba(251, 146, 60, 0.1); }
+    .choice-card input:checked + .card-inner .card-label { color: var(--saffron); }
+
+    /* List Items */
+    .selection-list { display: flex; flex-direction: column; gap: 1.25rem; }
+    .list-item .item-inner { border: 2px solid #f0f0f0; padding: 1.5rem 2rem; border-radius: 18px; display: flex; align-items: center; gap: 1.5rem; cursor: pointer; transition: 0.3s; }
+    .item-inner.space { justify-content: space-between; }
+    .item-icon { font-size: 2rem; }
+    .item-content strong { display: block; font-size: 1.15rem; color: var(--navy); margin-bottom: 2px; }
+    .item-content span { font-size: 0.85rem; color: #777; }
+    .currency { font-weight: 800; color: var(--saffron); font-size: 1.3rem; }
+
+    .list-item:hover .item-inner { border-color: var(--saffron); transform: translateX(5px); }
+    .list-item input:checked + .item-inner { border-color: var(--saffron); background: #fffcf9; border-width: 3px; }
+
+    /* Navigation */
+    .quiz-nav { display: flex; justify-content: space-between; margin-top: 3.5rem; align-items: center; }
+    .btn-back { background: none; border: none; font-weight: 700; color: #999; cursor: pointer; font-size: 1rem; }
+    .btn-next, .btn-submit { background: var(--navy); color: white; padding: 1.1rem 3rem; border: none; border-radius: 15px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+    .btn-submit { background: var(--saffron); }
+    .btn-next:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+    /* Results Layout */
+    .packages-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-bottom: 4.5rem; }
+    .section-label { font-size: 0.85rem; font-weight: 900; letter-spacing: 3px; color: #999; margin-bottom: 2.5rem; border-bottom: 1px solid #eee; padding-bottom: 1.2rem; }
+
+    .res-card { background: white; border-radius: 24px; border: 1px solid #eee; overflow: hidden; text-decoration: none; color: inherit; transition: 0.4s; display: flex; flex-direction: column; }
+    .res-card:hover { transform: translateY(-12px); box-shadow: 0 25px 50px rgba(0,0,0,0.1); }
+    .res-card-img { height: 240px; width: 100%; object-fit: cover; }
+    .res-card-body { padding: 2rem; flex: 1; display: flex; flex-direction: column; }
+    .res-card-meta { font-size: 0.75rem; color: var(--saffron); font-weight: 800; text-transform: uppercase; margin-bottom: 0.75rem; }
+    .res-card-body h3 { font-size: 1.25rem; font-weight: 800; line-height: 1.4; margin-bottom: 1.25rem; color: var(--navy); }
+    .res-card-price { font-size: 1.4rem; font-weight: 900; color: var(--navy); margin-top: auto; }
+
+    .suggestions { opacity: 0.85; }
+    .btn-outline-navy { background: none; border: 3px solid var(--navy); color: var(--navy); padding: 1.2rem 4rem; border-radius: 15px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+    .btn-outline-navy:hover { background: var(--navy); color: white; }
+
+    /* Loader */
+    .custom-loader { width: 55px; height: 55px; border: 5px solid #f0f0f0; border-top-color: var(--saffron); border-radius: 50%; display: inline-block; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 1024px) { 
+        .packages-grid { grid-template-columns: 1fr 1fr; } 
+    }
+    @media (max-width: 650px) { 
+        .packages-grid { grid-template-columns: 1fr; }
+        .quiz-window { padding: 2.5rem 1.5rem; } 
+        .question-text { font-size: 1.8rem; } 
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('style-quiz-form');
+        const steps = document.querySelectorAll('.quiz-step');
+        const pb = document.getElementById('quiz-pb');
+        const stepNumText = document.getElementById('step-num');
+        const questionText = document.getElementById('quiz-question');
+        
+        const nextBtn = document.getElementById('next-btn');
+        const backBtn = document.getElementById('back-btn');
+        const submitBtn = document.getElementById('submit-btn');
+
+        const questions = [
+            "Which landscape calls to you?",
+            "How long is your ideal escape?",
+            "What's your travel frequency?",
+            "Pick your sanctuary style",
+            "Define your investment range"
+        ];
+        
+        let step = 1;
+
+        function update() {
+            steps.forEach(s => s.style.display = 'none');
+            const current = document.querySelector(`.quiz-step[data-step="${step}"]`);
+            current.style.display = 'block';
+            
+            pb.style.width = `${(step / 5) * 100}%`;
+            stepNumText.textContent = step;
+            questionText.textContent = questions[step - 1];
+
+            backBtn.style.visibility = step === 1 ? 'hidden' : 'visible';
+            if (step === 5) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'block';
+            } else {
+                nextBtn.style.display = 'block';
+                submitBtn.style.display = 'none';
+            }
+        }
+
+        nextBtn.addEventListener('click', () => {
+            const currentInputs = document.querySelectorAll(`.quiz-step[data-step="${step}"] input`);
+            let checked = false;
+            currentInputs.forEach(i => { if(i.checked) checked = true; });
+
+            if (!checked) {
+                Swal.fire({ icon: 'info', title: 'Selection Needed', text: 'Please pick an option to find your vibe.', confirmButtonColor: '#fb923c' });
+                return;
+            }
+            step++;
+            update();
+        });
+
+        backBtn.addEventListener('click', () => {
+            step--;
+            update();
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            document.getElementById('style-quiz-form').style.display = 'none';
+            document.querySelector('.quiz-progress-section').style.display = 'none';
+            document.getElementById('quiz-loading').style.display = 'block';
+
+            const formData = new FormData(form);
+            const payload = Object.fromEntries(formData);
+
+            try {
+                const resp = await fetch('/features/api/quiz/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': formData.get('csrfmiddlewaretoken') },
+                    body: JSON.stringify(payload)
+                });
+                const data = await resp.json();
+                setTimeout(() => render(data), 1500);
+            } catch (err) {
+                Swal.fire({ title: 'Error', text: 'Network failure.', icon: 'error' });
+            }
+        });
+
+        function render(data) {
+            document.getElementById('quiz-entry').style.display = 'none';
+            const results = document.getElementById('quiz-results');
+            results.style.display = 'block';
+
+            const cardHtml = (p) => `
+                <a href="${p.url}" class="res-card">
+                    <img src="${p.image}" class="res-card-img">
+                    <div class="res-card-body">
+                        <div class="res-card-meta">${p.state} · ${p.duration}</div>
+                        <h3>${p.title}</h3>
+                        <div class="res-card-price">₹${p.price}</div>
+                    </div>
+                </a>
+            `;
+
+            // Dynamic Labeling
+            const matchLabel = document.getElementById('match-label');
+            if (data.is_perfect) {
+                matchLabel.textContent = '🎯 PERFECT MATCHES FOR YOU';
+            } else {
+                matchLabel.textContent = '✨ RECOMMENDED ALTERNATIVES';
+            }
+
+            document.getElementById('matches-grid').innerHTML = data.packages.map(p => cardHtml(p)).join('');
+            
+            if (data.suggestions && data.suggestions.length > 0) {
+                document.getElementById('suggestions-grid').innerHTML = data.suggestions.map(p => cardHtml(p)).join('');
+                document.getElementById('suggestions-wrap').style.display = 'block';
+            } else {
+                document.getElementById('suggestions-wrap').style.display = 'none';
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+</script>
+{% endblock %}

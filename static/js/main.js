@@ -437,7 +437,7 @@ document.addEventListener('click', async (e) => {
       const typing = this.showTyping();
 
       try {
-        const resp = await fetch('/api/chatbot/', {
+        const resp = await fetch('/features/chatbot/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -497,7 +497,7 @@ async function loadWeather(city) {
   if (!widget) return;
 
   try {
-    const resp = await fetch(`/api/weather/?city=${encodeURIComponent(city)}`);
+    const resp = await fetch(`/features/weather/?city=${encodeURIComponent(city)}`);
     const d = await resp.json();
     if (d.error) return;
 
@@ -573,7 +573,7 @@ async function loadWeather(city) {
     });
 
     try {
-      const resp = await fetch(`/api/budget/?${params}`);
+      const resp = await fetch(`/features/budget/?${params}`);
       const d = await resp.json();
       renderResult(d);
     } catch { }
@@ -640,7 +640,7 @@ async function initIndiaMap() {
   }).addTo(map);
 
   try {
-    const resp = await fetch('/api/destinations/');
+    const resp = await fetch('/features/destinations/');
     const { destinations } = await resp.json();
 
     const customIcon = L.divIcon({

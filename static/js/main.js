@@ -18,6 +18,29 @@
   }, { passive: true });
 })();
 
+// ── PAGE LOADING BAR ─────────────────────────────────────────────
+(function () {
+  const bar = document.createElement('div');
+  bar.id = 'page-loader-bar';
+  bar.style = 'position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--saffron),var(--teal));z-index:9999;width:0;transition:width .4s ease;opacity:0';
+  document.body.appendChild(bar);
+
+  window.addEventListener('beforeunload', () => {
+    bar.style.opacity = '1';
+    bar.style.width = '70%';
+  });
+
+  document.querySelectorAll('a').forEach(link => {
+    if (link.hostname === window.location.hostname && !link.hash && link.target !== '_blank') {
+      link.addEventListener('click', () => {
+        bar.style.opacity = '1';
+        bar.style.width = '30%';
+        setTimeout(() => { bar.style.width = '60%'; }, 200);
+      });
+    }
+  });
+})();
+
 // ── HAMBURGER / MOBILE MENU ──────────────────────────────────────
 (function () {
   const hamburger = document.querySelector('.hamburger');
@@ -434,6 +457,9 @@ document.addEventListener('click', async (e) => {
 
     async sendMessage(text) {
       this.addUserMsg(text);
+      
+      // Artificial delay before typing starts to feel natural
+      await new Promise(r => setTimeout(r, 450));
       const typing = this.showTyping();
 
       try {
@@ -447,6 +473,9 @@ document.addEventListener('click', async (e) => {
         });
         const data = await resp.json();
         typing.remove();
+        
+        // Slightly more delay before bot reply appears
+        await new Promise(r => setTimeout(r, 300));
         
         const richData = data.tours ? { tours: data.tours } : null;
         this.addBotMsg(data.reply || "I'm sorry, I couldn't understand that. Try asking about a destination!", true, richData);
@@ -479,8 +508,11 @@ document.addEventListener('click', async (e) => {
 
     scrollToBottom() {
       setTimeout(() => {
-        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
-      }, 50);
+        this.messagesContainer.scrollTo({
+          top: this.messagesContainer.scrollHeight,
+          behavior: 'smooth'
+        });
+      }, 60);
     }
   }
 

@@ -2,6 +2,8 @@ from django import forms
 from django.utils import timezone
 from datetime import timedelta
 from .models import Booking, Payment
+import re
+from datetime import datetime
 
 
 class BookingForm(forms.ModelForm):
@@ -47,22 +49,16 @@ class BookingForm(forms.ModelForm):
 
 class PaymentForm(forms.Form):
     METHOD_CHOICES = [
-        ('upi', '💳 UPI'),
         ('card', '💳 Credit / Debit Card'),
-        ('netbanking', '🏦 Net Banking'),
-        ('wallet', '📱 Digital Wallet'),
+        ('razorpay', '🚀 Razorpay (UPI, Wallets, etc.)'),
     ]
     method = forms.ChoiceField(
         choices=METHOD_CHOICES,
         widget=forms.RadioSelect(attrs={'class': 'payment-radio'}),
-        initial='upi'
+        initial='razorpay'
     )
-
-    # UPI fields
-    upi_id = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'yourname@upi', 'id': 'id_upi_id'})
-    )
+    
+    razorpay_payment_id = forms.CharField(required=False, widget=forms.HiddenInput())
 
     # Card fields
     card_name = forms.CharField(
@@ -84,14 +80,64 @@ class PaymentForm(forms.Form):
         widget=forms.PasswordInput(attrs={'placeholder': 'CVV', 'id': 'id_card_cvv', 'maxlength': '4'})
     )
 
+    def clean_card_number(self):
+        number = self.cleaned_data.get('card_number', '').replace(' ', '')
+        method = self.data.get('method')
+        if method == 'card' and number:
+            if not number.isdigit() or not (13 <= len(number) <= 19):
+                raise forms.ValidationError('Card number must be 13-19 digits.')
+            
+            # Luhn Algorithm
+            total = 0
+            reverse_digits = number[::-1]
+            for i, digit in enumerate(reverse_digits):
+                n = int(digit)
+                if i % 2 == 1:
+                    n *= 2
+                    if n > 9:
+                        n -= 9
+                total += n
+            if total % 10 != 0:
+                raise forms.ValidationError('Invalid card number (Luhn check failed).')
+        return number
+
+    def clean_card_expiry(self):
+        expiry = self.cleaned_data.get('card_expiry')
+        method = self.data.get('method')
+        if method == 'card' and expiry:
+            if not re.match(r'^(0[1-9]|1[0-2])\/([0-9]{2})$', expiry):
+                raise forms.ValidationError('Expiry must be in MM/YY format.')
+            
+            # Check if date is in the future
+            month, year = map(int, expiry.split('/'))
+            year += 2000  # Assume 21st century
+            now = datetime.now()
+            if year < now.year or (year == now.year and month < now.month):
+                raise forms.ValidationError('Card has expired.')
+        return expiry
+
+    def clean_card_cvv(self):
+        cvv = self.cleaned_data.get('card_cvv')
+        method = self.data.get('method')
+        if method == 'card' and cvv:
+            if not cvv.isdigit() or len(cvv) not in [3, 4]:
+                raise forms.ValidationError('CVV must be 3 or 4 digits.')
+        return cvv
+
     def clean(self):
         cleaned_data = super().clean()
         method = cleaned_data.get('method')
-        if method == 'upi' and not cleaned_data.get('upi_id'):
-            self.add_error('upi_id', 'Please enter your UPI ID.')
+        
         if method == 'card':
             if not cleaned_data.get('card_name'):
                 self.add_error('card_name', 'Card holder name is required.')
             if not cleaned_data.get('card_number'):
                 self.add_error('card_number', 'Card number is required.')
+            if not cleaned_data.get('card_expiry'):
+                self.add_error('card_expiry', 'Expiry date is required.')
+            if not cleaned_data.get('card_cvv'):
+                self.add_error('card_cvv', 'CVV is required.')
+        elif method == 'razorpay':
+            pass
+            
         return cleaned_data

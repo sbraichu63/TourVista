@@ -79,6 +79,12 @@ class Destination(models.Model):
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     is_featured = models.BooleanField(default=False)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['state']),
+            models.Index(fields=['is_featured']),
+        ]
+
     def __str__(self):
         return f"{self.name}, {self.get_state_display()}"
 
@@ -130,6 +136,15 @@ class TourPackage(models.Model):
 
     class Meta:
         ordering = ['-is_featured', '-created_at']
+        indexes = [
+            models.Index(fields=['is_active']),
+            models.Index(fields=['state']),
+            models.Index(fields=['price_per_person']),
+            models.Index(fields=['is_featured', 'created_at']),
+            models.Index(fields=['is_active', 'state']),
+            models.Index(fields=['difficulty']),
+            models.Index(fields=['best_season']),
+        ]
 
     def __str__(self):
         return self.title
@@ -204,6 +219,10 @@ class Review(models.Model):
     class Meta:
         unique_together = ('package', 'user')
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['rating']),
+            models.Index(fields=['created_at']),
+        ]
 
     def __str__(self):
         return f"{self.user.username} → {self.package.title} ({self.rating}★)"

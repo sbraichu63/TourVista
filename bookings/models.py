@@ -51,6 +51,11 @@ class Booking(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['status']),
+            models.Index(fields=['created_at']),
+            models.Index(fields=['travel_date']),
+        ]
 
     def __str__(self):
         return f"#{self.booking_ref} — {self.user.username} → {self.package.title}"

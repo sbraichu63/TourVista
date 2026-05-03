@@ -82,12 +82,11 @@ def payment_view(request, booking_ref):
             method = form.cleaned_data['method']
             card_last4 = ''
             upi_id = ''
+            txn_id = form.cleaned_data.get('razorpay_payment_id', '')
 
             if method == 'card':
                 raw = form.cleaned_data.get('card_number', '').replace(' ', '')
                 card_last4 = raw[-4:] if len(raw) >= 4 else '0000'
-            elif method == 'upi':
-                upi_id = form.cleaned_data.get('upi_id', '')
 
             payment = Payment.objects.create(
                 booking=booking,
@@ -96,6 +95,7 @@ def payment_view(request, booking_ref):
                 status='paid',
                 card_last4=card_last4,
                 upi_id=upi_id,
+                transaction_id=txn_id if txn_id else None,
                 paid_at=timezone.now(),
             )
 

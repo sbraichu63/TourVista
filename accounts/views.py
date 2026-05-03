@@ -7,11 +7,13 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 import logging
+import random
+import string
 
 logger = logging.getLogger(__name__)
 
 from .forms import RegisterForm, LoginForm, ProfileUpdateForm
-from .models import UserProfile, EmailVerificationToken
+from .models import UserProfile, EmailOTP
 from bookings.models import Booking
 
 
@@ -36,24 +38,21 @@ def register_view(request):
             phone = form.cleaned_data.get('phone', '')
             UserProfile.objects.create(user=user, phone=phone, email_verified=False)
 
-            # Create email verification token
-            token_obj = EmailVerificationToken.objects.create(user=user)
-            verify_url = request.build_absolute_uri(
-                f'/accounts/verify-email/{token_obj.token}/'
-            )
+            # Create email verification OTP
+            otp_code = ''.join(random.choices(string.digits, k=6))
+            EmailOTP.objects.create(user=user, otp=otp_code)
 
             # Send verification email
             try:
                 send_mail(
-                    subject='🌏 Verify Your TourVista India Email',
+                    subject='🌏 Verify Your TourVista India Account',
                     message=f'''Hi {user.first_name or user.username}!
 
-Welcome to TourVista India — Your Gateway to Incredible India! 🇮🇳
+Welcome to TourVista India! 🇮🇳
 
-Please verify your email by clicking the link below:
-{verify_url}
+Your verification code is: {otp_code}
 
-This link expires in 24 hours.
+Please enter this code on the verification page to activate your account. This code expires in 10 minutes.
 
 Happy Travels!
 — Team TourVista India
@@ -65,9 +64,9 @@ Happy Travels!
             except Exception as e:
                 logger.warning(f'Email verification failed for user {user.username}: {str(e)}')
 
-            messages.success(request, f'🎉 Account created! Check your email ({user.email}) to verify.')
+            messages.success(request, f'🎉 Account created! We sent a 6-digit code to {user.email}.')
             login(request, user)
-            return redirect('accounts:dashboard')
+            return redirect('accounts:verify_otp')
         else:
             messages.error(request, 'Please fix the errors below.')
     else:
@@ -77,44 +76,57 @@ Happy Travels!
 
 
 # ──────────────────────────────────────────────────────────────────
-# EMAIL VERIFICATION
+# OTP VERIFICATION
 # ──────────────────────────────────────────────────────────────────
-def verify_email(request, token):
-    token_obj = get_object_or_404(EmailVerificationToken, token=token, is_used=False)
+@login_required
+def verify_otp(request):
+    if request.user.profile.email_verified:
+        return redirect('accounts:dashboard')
 
-    profile = token_obj.user.profile
-    profile.email_verified = True
-    profile.save()
+    if request.method == 'POST':
+        otp_entered = request.POST.get('otp', '').strip()
+        
+        # Get latest valid OTP
+        otp_obj = EmailOTP.objects.filter(user=request.user, is_verified=False).order_by('-created_at').first()
+        
+        if otp_obj and otp_obj.is_valid() and otp_obj.otp == otp_entered:
+            otp_obj.is_verified = True
+            otp_obj.save()
+            
+            profile = request.user.profile
+            profile.email_verified = True
+            profile.save()
+            
+            messages.success(request, '✅ Email verified successfully! You can now book tours.')
+            return redirect('accounts:dashboard')
+        else:
+            messages.error(request, '❌ Invalid or expired OTP. Please try again.')
 
-    token_obj.is_used = True
-    token_obj.save()
-
-    messages.success(request, '✅ Email verified successfully! You can now book tours.')
-    return render(request, 'accounts/verify_success.html', {'user': token_obj.user})
+    return render(request, 'accounts/verify_otp.html')
 
 
-def resend_verification(request):
-    if not request.user.is_authenticated:
-        return redirect('accounts:login')
+@login_required
+def resend_otp(request):
+    if request.user.profile.email_verified:
+        return redirect('accounts:dashboard')
 
-    # Delete old tokens
-    EmailVerificationToken.objects.filter(user=request.user, is_used=False).delete()
-    token_obj = EmailVerificationToken.objects.create(user=request.user)
-    verify_url = request.build_absolute_uri(f'/accounts/verify-email/{token_obj.token}/')
+    # Generate new OTP
+    otp_code = ''.join(random.choices(string.digits, k=6))
+    EmailOTP.objects.create(user=request.user, otp=otp_code)
 
     try:
         send_mail(
-            subject='🌏 Verify Your TourVista India Email',
-            message=f'Click to verify: {verify_url}',
+            subject='🌏 Your New TourVista Verification Code',
+            message=f'Your new verification code is: {otp_code}',
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[request.user.email],
         )
-        messages.success(request, '📧 Verification email resent! Check your inbox.')
+        messages.success(request, '📧 New code sent! Check your inbox.')
     except Exception as e:
-        logger.warning(f'Email resend failed for user {request.user.username}: {str(e)}')
+        logger.warning(f'OTP resend failed for user {request.user.username}: {str(e)}')
         messages.error(request, 'Could not send email. Please try again later.')
 
-    return redirect('accounts:dashboard')
+    return redirect('accounts:verify_otp')
 
 
 # ──────────────────────────────────────────────────────────────────

@@ -28,11 +28,17 @@ class UserProfile(models.Model):
         return None
 
 
-class EmailVerificationToken(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    token = models.UUIDField(default=uuid.uuid4, unique=True)
+class EmailOTP(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='otps')
+    otp = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
-    is_used = models.BooleanField(default=False)
+    is_verified = models.BooleanField(default=False)
+
+    def is_valid(self):
+        from django.utils import timezone
+        from datetime import timedelta
+        # 10 minutes validity
+        return timezone.now() < self.created_at + timedelta(minutes=10)
 
     def __str__(self):
-        return f"Token for {self.user.username}"
+        return f"OTP for {self.user.username}"

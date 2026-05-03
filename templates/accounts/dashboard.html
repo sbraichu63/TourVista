@@ -14,7 +14,7 @@
         📧 Please verify your email <strong>{{ request.user.email }}</strong> to unlock all booking features.
       </span>
     </div>
-    <a href="{% url 'accounts:resend_verification' %}" class="btn btn-sm" style="background:#D97706;color:white;border-radius:999px">Resend Email</a>
+    <a href="{% url 'accounts:resend_otp' %}" class="btn btn-sm" style="background:#D97706;color:white;border-radius:999px">Resend Code</a>
   </div>
   {% endif %}
 

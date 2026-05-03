@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verify Your Account — TourVista India{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="container">
+        <div class="auth-card" style="max-width: 500px; margin: 4rem auto;">
+            <div class="auth-header" style="text-align: center;">
+                <div class="auth-icon" style="background: rgba(255, 107, 53, 0.1); color: var(--saffron); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-size: 1.5rem;">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+                <h2 style="font-size: 1.75rem; margin-bottom: 0.5rem; color: var(--navy);">Verify Your Email</h2>
+                <p style="color: var(--gray-500); font-size: 0.9rem;">We've sent a 6-digit verification code to <strong>{{ request.user.email }}</strong></p>
+            </div>
+
+            <form method="post" id="otp-form" class="auth-form" style="margin-top: 2rem;">
+                {% csrf_token %}
+                
+                <div class="otp-container" style="display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 2rem;">
+                    <input type="text" class="otp-input" maxlength="1" pattern="\d" required style="width: 50px; height: 60px; text-align: center; font-size: 1.5rem; font-weight: 700; border: 2px solid var(--gray-200); border-radius: 12px; background: var(--ivory); transition: all 0.3s ease;">
+                    <input type="text" class="otp-input" maxlength="1" pattern="\d" required style="width: 50px; height: 60px; text-align: center; font-size: 1.5rem; font-weight: 700; border: 2px solid var(--gray-200); border-radius: 12px; background: var(--ivory); transition: all 0.3s ease;">
+                    <input type="text" class="otp-input" maxlength="1" pattern="\d" required style="width: 50px; height: 60px; text-align: center; font-size: 1.5rem; font-weight: 700; border: 2px solid var(--gray-200); border-radius: 12px; background: var(--ivory); transition: all 0.3s ease;">
+                    <input type="text" class="otp-input" maxlength="1" pattern="\d" required style="width: 50px; height: 60px; text-align: center; font-size: 1.5rem; font-weight: 700; border: 2px solid var(--gray-200); border-radius: 12px; background: var(--ivory); transition: all 0.3s ease;">
+                    <input type="text" class="otp-input" maxlength="1" pattern="\d" required style="width: 50px; height: 60px; text-align: center; font-size: 1.5rem; font-weight: 700; border: 2px solid var(--gray-200); border-radius: 12px; background: var(--ivory); transition: all 0.3s ease;">
+                    <input type="text" class="otp-input" maxlength="1" pattern="\d" required style="width: 50px; height: 60px; text-align: center; font-size: 1.5rem; font-weight: 700; border: 2px solid var(--gray-200); border-radius: 12px; background: var(--ivory); transition: all 0.3s ease;">
+                </div>
+                
+                <input type="hidden" name="otp" id="final-otp">
+
+                <button type="submit" class="btn btn-primary w-100" style="padding: 1rem; font-weight: 700; border-radius: 12px; font-size: 1rem; justify-content: center;">
+                    Verify Account
+                </button>
+            </form>
+
+            <div class="auth-footer" style="margin-top: 2rem; text-align: center; border-top: 1px solid var(--gray-100); padding-top: 1.5rem;">
+                <p style="font-size: 0.9rem; color: var(--gray-500);">
+                    Didn't receive the code? 
+                    <a href="{% url 'accounts:resend_otp' %}" class="link" style="color: var(--saffron); font-weight: 700;">Resend OTP</a>
+                </p>
+                <a href="{% url 'accounts:dashboard' %}" style="display: block; margin-top: 1rem; font-size: 0.85rem; color: var(--gray-400);">Go to Dashboard (Unverified)</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.otp-input:focus {
+    border-color: var(--saffron) !important;
+    background: white !important;
+    box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+    outline: none;
+}
+.otp-input.filled {
+    border-color: var(--navy);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('.otp-input');
+    const finalInput = document.getElementById('final-otp');
+    const form = document.getElementById('otp-form');
+
+    inputs.forEach((input, index) => {
+        // Handle input
+        input.addEventListener('input', function(e) {
+            if (this.value.length > 1) {
+                this.value = this.value.slice(0, 1);
+            }
+            
+            if (this.value && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+            }
+            
+            updateFinalValue();
+        });
+
+        // Handle backspace
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && !this.value && index > 0) {
+                inputs[index - 1].focus();
+            }
+        });
+
+        // Handle paste
+        input.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pasteData = e.clipboardData.getData('text').slice(0, 6).split('');
+            pasteData.forEach((char, i) => {
+                if (inputs[index + i]) {
+                    inputs[index + i].value = char;
+                }
+            });
+            updateFinalValue();
+            if (inputs[index + pasteData.length]) {
+                inputs[index + pasteData.length].focus();
+            } else {
+                inputs[inputs.length - 1].focus();
+            }
+        });
+    });
+
+    function updateFinalValue() {
+        let otp = '';
+        inputs.forEach(input => {
+            otp += input.value;
+            if (input.value) {
+                input.classList.add('filled');
+            } else {
+                input.classList.remove('filled');
+            }
+        });
+        finalInput.value = otp;
+    }
+
+    form.addEventListener('submit', function(e) {
+        if (finalInput.value.length !== 6) {
+            e.preventDefault();
+            alert('Please enter all 6 digits of the verification code.');
+        }
+    });
+    
+    // Initial focus
+    inputs[0].focus();
+});
+</script>
+{% endblock %}

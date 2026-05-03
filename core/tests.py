@@ -7,7 +7,7 @@ from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.urls import reverse
 from core.models import TourPackage, Destination, Review, Wishlist
-from accounts.models import UserProfile, EmailVerificationToken
+from accounts.models import UserProfile
 from bookings.models import Booking, Payment
 import uuid
 

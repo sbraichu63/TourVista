@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from .models import TourPackage, Destination, Review, Wishlist, Place, INDIAN_STATES, SEASONS, DIFFICULTY_LEVELS
 import json
@@ -105,6 +106,18 @@ def package_list(request):
         'sort': sort,
         'total_count': packages.count(),
     }
+
+    # Pagination
+    paginator = Paginator(packages, 6)  # Show 6 packages per page
+    page = request.GET.get('page')
+    try:
+        paginated_packages = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_packages = paginator.page(1)
+    except EmptyPage:
+        paginated_packages = paginator.page(paginator.num_pages)
+
+    context['packages'] = paginated_packages
     return render(request, 'core/packages.html', context)
 
 

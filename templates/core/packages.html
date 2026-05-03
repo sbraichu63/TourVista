@@ -160,6 +160,39 @@
           {% endfor %}
         </div>
 
+        {% if packages.has_other_pages %}
+        <div class="pagination">
+          <div class="pagination-info">
+            Showing {{ packages.start_index }} to {{ packages.end_index }} of {{ total_count }} results
+          </div>
+          <div class="pagination-links">
+            {% if packages.has_previous %}
+              <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ packages.previous_page_number }}" class="page-link prev">
+                <i class="fas fa-arrow-left"></i> <span>Prev</span>
+              </a>
+            {% else %}
+              <span class="page-link disabled"><i class="fas fa-arrow-left"></i> <span>Prev</span></span>
+            {% endif %}
+
+            {% for i in packages.paginator.page_range %}
+              {% if packages.number == i %}
+                <span class="page-link active">{{ i }}</span>
+              {% elif i > packages.number|add:'-3' and i < packages.number|add:'3' %}
+                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ i }}" class="page-link">{{ i }}</a>
+              {% endif %}
+            {% endfor %}
+
+            {% if packages.has_next %}
+              <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ packages.next_page_number }}" class="page-link next">
+                <span>Next</span> <i class="fas fa-arrow-right"></i>
+              </a>
+            {% else %}
+              <span class="page-link disabled"><span>Next</span> <i class="fas fa-arrow-right"></i></span>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+
         {% else %}
         <div class="empty-state" style="background:white;border-radius:var(--radius-lg);padding:4rem">
           <div class="empty-icon">🔍</div>
@@ -178,6 +211,7 @@
 function sortPackages(val) {
   const url = new URL(window.location.href);
   url.searchParams.set('sort', val);
+  url.searchParams.delete('page'); // Reset to first page on sort change
   window.location.href = url.toString();
 }
 </script>

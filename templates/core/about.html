@@ -1,74 +1,249 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block title %}About TourVista India — Our Story{% endblock %}
 
-{% block content %}
-<div class="page-hero">
-  <div class="container">
-    <div class="badge-tag" style="background:rgba(255,255,255,.1);color:white;border-color:rgba(255,255,255,.2)">Since 2024</div>
-    <h1>Namaste! We are TourVista.</h1>
-    <p>We are a team of travel enthusiasts dedicated to showing you the true soul of Incredible India 🇮🇳</p>
-  </div>
-</div>
+{% block meta_description %}Learn about TourVista India, our mission to redefine travel in Incredible India, and the
+passionate team behind your curated experiences.{% endblock %}
 
+{% block extra_css %}
+<style>
+  /* ── ABOUT PAGE HERO ────────────────────────────────────────── */
+  .page-hero {
+    position: relative;
+    padding: 12rem 0 8rem;
+    background: linear-gradient(rgba(13, 27, 42, 0.75), rgba(13, 27, 42, 0.85)),
+    url("{% static 'img/about_story.png' %}") center/cover no-repeat fixed;
+    color: white;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .page-hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: linear-gradient(to top, var(--white), transparent);
+    z-index: 2;
+  }
+
+  .page-hero h1 {
+    color: white;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+  }
+
+  .page-hero .highlight {
+    background: linear-gradient(135deg, var(--saffron), #FFB347);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .page-hero p {
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 650px;
+    margin: 0 auto;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* ── STORY SECTION ──────────────────────────────────────────── */
+  .story-image-wrapper {
+    position: relative;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    aspect-ratio: 3/2;
+    max-height: 450px;
+  }
+
+  .story-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+
+  .story-image-wrapper:hover img {
+    transform: scale(1.08);
+  }
+
+
+  /* ── VALUE CARDS ────────────────────────────────────────────── */
+  .value-card {
+    background: white;
+    padding: 3rem 2rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-100);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-align: center;
+    height: 100%;
+  }
+
+  .value-card:hover {
+    transform: translateY(-15px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--saffron-light);
+  }
+
+  .value-icon {
+    font-size: 3.5rem;
+    margin-bottom: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ivory);
+    width: 100px;
+    height: 100px;
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    transition: var(--transition);
+  }
+
+  .value-card:hover .value-icon {
+    border-radius: 50%;
+    background: var(--cream);
+    transform: rotate(10deg);
+  }
+
+
+  /* ── CTA SECTION ────────────────────────────────────────────── */
+  .cta-section {
+    background: var(--navy);
+    padding: 8rem 0;
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-section-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 70% 30%, rgba(255, 107, 53, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 20% 80%, rgba(10, 126, 164, 0.15) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  @media (max-width: 991px) {
+    .story-grid {
+      grid-template-columns: 1fr !important;
+      gap: 4rem !important;
+    }
+
+    .page-hero {
+      padding: 10rem 0 6rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="page-hero">
+  <div class="container" data-aos="zoom-out" data-aos-duration="1200">
+    <div class="hero-badge" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)">
+      <span class="dot"></span> Established 2026
+    </div>
+    <h1>We Believe in the Magic of <br><span class="highlight">Discovery</span></h1>
+    <p>TourVista India is on a mission to redefine how the world explores the vibrant tapestry of Incredible India.</p>
+  </div>
+</section>
+
+<!-- OUR STORY -->
 <section class="section">
   <div class="container">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center">
-      <div>
-        <h2 style="color:var(--navy);margin-bottom:1.5rem">Our Mission</h2>
-        <p style="font-size:1.1rem;color:var(--gray-600);line-height:1.7;margin-bottom:1.5rem">
-          India is not just a destination; it's an experience that stays with you forever. Our mission is to make this experience seamless, authentic, and accessible to everyone.
+    <div class="story-grid" style="display:grid;grid-template-columns:0.85fr 1.15fr;gap:5rem;align-items:center">
+
+      <div class="story-image-wrapper" data-aos="fade-right">
+        <img src="{% static 'img/about_story.png' %}" alt="Our Story Image">
+      </div>
+
+      <div data-aos="fade-left">
+        <div class="section-header" style="text-align:left; margin-bottom: 2rem">
+          <span class="badge-tag">Our Philosophy</span>
+          <h2 style="font-size: clamp(2rem, 4vw, 3.2rem)">Beyond the Ordinary</h2>
+        </div>
+
+        <p style="font-size:1.15rem; color: var(--gray-700); line-height: 1.8; margin-bottom: 2rem">
+          India isn't just a country; it's an emotion, a sensory overload, and a collection of a thousand different
+          stories. At TourVista, we don't just book tours—we curate experiences that touch your soul.
         </p>
-        <p style="color:var(--gray-500);line-height:1.6">
-          Whether it's the golden sands of Rajasthan, the tranquil backwaters of Kerala, or the snow-capped peaks of the Himalayas, we curate every tour with love and precision. We believe in sustainable tourism that respects local cultures and empowers communities.
+
+        <p style="color: var(--gray-500); line-height: 1.7; margin-bottom: 3rem">
+          Our journey began with a simple goal: to make authentic Indian experiences accessible without the usual stress
+          of travel planning. We've spent years traversing the length and breadth of this beautiful nation to find the
+          perfect balance between luxury, authenticity, and sustainability.
         </p>
-        
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:2rem">
-          <div style="background:var(--gray-50);padding:1.5rem;border-radius:var(--radius)">
-            <div style="font-size:2rem;font-weight:800;color:var(--saffron)">100+</div>
-            <div style="font-size:.85rem;color:var(--gray-500);font-weight:600">Curated Tours</div>
-          </div>
-          <div style="background:var(--gray-50);padding:1.5rem;border-radius:var(--radius)">
-            <div style="font-size:2rem;font-weight:800;color:var(--teal)">50k+</div>
-            <div style="font-size:.85rem;color:var(--gray-500);font-weight:600">Happy Travellers</div>
-          </div>
+
+
+        <div style="margin-top: 4rem">
+          <a href="{% url 'core:packages' %}" class="btn btn-primary">Start Your Adventure <i
+              class="fas fa-arrow-right"></i></a>
         </div>
       </div>
-      <div>
-        <div style="position:relative">
-          <div style="width:100%;height:450px;border-radius:var(--radius-xl);background:linear-gradient(45deg,var(--navy),var(--teal));display:flex;align-items:center;justify-content:center;font-size:10rem">🛶</div>
-          <div style="position:absolute;bottom:-20px;right:-20px;background:var(--white);padding:1.5rem;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:200px">
-            <div style="font-size:1.5rem;font-weight:800;color:var(--navy)">#1</div>
-            <div style="font-size:.8rem;color:var(--gray-500)">Award winning travel agency in 2025</div>
-          </div>
-        </div>
-      </div>
+
     </div>
   </div>
 </section>
 
-<section class="section" style="background:var(--navy);color:white">
+<!-- VALUES -->
+<section class="section" style="background: var(--gray-50); position: relative">
   <div class="container">
-    <div class="section-header" style="text-align:center">
-      <h2 style="color:white">Why Choose TourVista?</h2>
+    <div class="section-header" data-aos="fade-up">
+      <span class="badge-tag">Core Values</span>
+      <h2>What Drives Us</h2>
+      <p>We are guided by a commitment to excellence and a passion for Indian heritage.</p>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2rem">
-      <div style="text-align:center;padding:2rem;background:rgba(255,255,255,.05);border-radius:var(--radius-lg)">
-        <div style="font-size:3rem;margin-bottom:1rem">💎</div>
-        <h3 style="color:white;margin-bottom:1rem">Best Price Guarantee</h3>
-        <p style="color:rgba(255,255,255,.6);font-size:.9rem">We work directly with local vendors to ensure you get the best value for your money without compromising on quality.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:2.5rem">
+
+      <div class="value-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="value-icon">🛶</div>
+        <h3>Authenticity First</h3>
+        <p>We skip the tourist traps and take you straight to the heart of local culture, from home-cooked meals to
+          hidden ancient ruins.</p>
       </div>
-      <div style="text-align:center;padding:2rem;background:rgba(255,255,255,.05);border-radius:var(--radius-lg)">
-        <div style="font-size:3rem;margin-bottom:1rem">🤝</div>
-        <h3 style="color:white;margin-bottom:1rem">Verified Experts</h3>
-        <p style="color:rgba(255,255,255,.6);font-size:.9rem">Our tour guides are locals who know the hidden gems and history that typical tourists never get to see.</p>
+
+      <div class="value-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="value-icon">💎</div>
+        <h3>Premium Comfort</h3>
+        <p>Even in the most remote corners of India, we ensure your stay is comfortable, safe, and of the highest
+          standard.</p>
       </div>
-      <div style="text-align:center;padding:2rem;background:rgba(255,255,255,.05);border-radius:var(--radius-lg)">
-        <div style="font-size:3rem;margin-bottom:1rem">🛡️</div>
-        <h3 style="color:white;margin-bottom:1rem">24/7 Support</h3>
-        <p style="color:rgba(255,255,255,.6);font-size:.9rem">From the moment you land until you depart, our dedicated support team is just a call away for anything you need.</p>
+
+      <div class="value-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="value-icon">🌿</div>
+        <h3>Sustainable Impact</h3>
+        <p>We believe in leaving a positive footprint. Our tours support local artisans and respect the fragile
+          ecosystems of India.</p>
       </div>
+
     </div>
   </div>
 </section>
+
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-section-bg"></div>
+  <div class="container" data-aos="zoom-in" style="position: relative; z-index: 2">
+    <h2 style="color: white; font-size: clamp(2.2rem, 5vw, 3.5rem); margin-bottom: 1.5rem">Ready for Your Next Story?
+    </h2>
+    <p style="color: rgba(255,255,255,0.75); font-size: 1.25rem; max-width: 700px; margin: 0 auto 3.5rem">
+      The beauty of India is waiting for you. Let us take you there with the care and expertise you deserve.
+    </p>
+    <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap">
+      <a href="{% url 'core:packages' %}" class="btn btn-white btn-lg">Browse All Packages</a>
+      <a href="{% url 'features:quiz' %}" class="btn btn-outline btn-lg"
+        style="color: white; border-color: rgba(255,255,255,0.4)">Take Style Quiz <i class="fas fa-magic"></i></a>
+    </div>
+  </div>
+</section>
+
 {% endblock %}

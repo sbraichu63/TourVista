@@ -54,6 +54,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -83,26 +84,26 @@ TEMPLATES = [
 WSGI_APPLICATION = 'tourvista.wsgi.application'
 
 # ─── DATABASE ────────────────────────────────────────────────────────────────
-# Using SQLite for development (no XAMPP required)
-# To switch to MySQL, uncomment the MySQL block and comment the SQLite block
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# Database configuration supporting both SQLite (development) and PostgreSQL (production)
+import dj_database_url
 
-# MySQL (uncomment when XAMPP is running and tourvista_db is created):
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'tourvista_db',
-#         'USER': 'root',
-#         'PASSWORD': '',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#     }
-# }
+if os.environ.get('DATABASE_URL'):
+    # Production: Use PostgreSQL from DATABASE_URL (Render)
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    # Development: Use SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # ─── PASSWORD VALIDATION ─────────────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
@@ -120,11 +121,28 @@ USE_TZ = True
 
 # ─── STATIC & MEDIA FILES ─────────────────────────────────────────────────────
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+if DEBUG:
+    STATICFILES_DIRS = [BASE_DIR / 'static']
+else:
+    # Production: WhiteNoise serves static files
+    STATICFILES_DIRS = []
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# ─── PRODUCTION SECURITY SETTINGS ────────────────────────────────────────────────
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_SECURITY_POLICY = {
+        'default-src': ("'self'", ),
+    }
+
+# CSRF trusted origins for custom domain
+CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'https://localhost').split(',')
 
 # ─── DEFAULT PRIMARY KEY ───────────────────────────────────────────────────────
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -85,10 +85,10 @@ WSGI_APPLICATION = 'tourvista.wsgi.application'
 
 # ─── DATABASE ────────────────────────────────────────────────────────────────
 # Database configuration supporting both SQLite (development) and PostgreSQL (production)
-import dj_database_url
 
 if os.environ.get('DATABASE_URL'):
     # Production: Use PostgreSQL from DATABASE_URL (Render)
+    import dj_database_url
     DATABASES = {
         'default': dj_database_url.config(
             default=os.environ.get('DATABASE_URL'),

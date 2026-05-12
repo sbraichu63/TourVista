@@ -318,13 +318,10 @@ def destinations_map(request):
             # Count active packages for this destination
             pkg_count = TourPackage.objects.filter(destination=d, is_active=True).count()
             
-            # Fix for missing image
             image_url = d.image.url if d.image else "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=600&q=80"
             
-            # Fix for description
             desc = d.description[:100] + "..." if d.description else "Discover the beauty and culture of " + d.name + "."
             
-            # Fix for state display (if code is used)
             state_display = d.get_state_display()
             if len(state_display) <= 3: # Likely a code like 'MH'
                 state_map = {'MH': 'Maharashtra', 'RJ': 'Rajasthan', 'GA': 'Goa', 'KL': 'Kerala', 'HP': 'Himachal Pradesh'}
